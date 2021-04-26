@@ -113,7 +113,7 @@ class HiveBackupTestCase(unittest.TestCase):
     def test_echo(self):
         logging.getLogger("HiveBackupTestCase").debug("\nRunning test_a_echo")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/echo',
+            self.test_client.post('/api/v2/echo',
                                   data=json.dumps({"key": "value"}),
                                   headers=self.json_header)
         )
@@ -130,12 +130,11 @@ class HiveBackupTestCase(unittest.TestCase):
             "client_secret": "mqaI40MlghlNkfaFtDBzvpGg", "scopes": ["https://www.googleapis.com/auth/drive"],
             "expiry": "2020-11-18T04:13:37Z"}'''
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/backup/save_to_google_drive',
+            self.test_client.post('/api/v2/backup/save_to_google_drive',
                                   data=google_auth_token,
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         drive_name = HiveBackup.gene_did_google_drive_name(self.did)
         HiveBackup.save_vault_data(self.did)
 
@@ -149,12 +148,11 @@ class HiveBackupTestCase(unittest.TestCase):
             "client_secret": "mqaI40MlghlNkfaFtDBzvpGg", "scopes": ["https://www.googleapis.com/auth/drive"],
             "expiry": "2020-11-18T04:13:37Z"}'''
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/backup/restore_from_google_drive',
+            self.test_client.post('/api/v2/backup/restore_from_google_drive',
                                   data=google_auth_token,
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         drive_name = HiveBackup.gene_did_google_drive_name(self.did)
         HiveBackup.restore_vault_data(self.did)
 
@@ -162,7 +160,7 @@ class HiveBackupTestCase(unittest.TestCase):
         param = {}
         token = test_common.get_auth_token()
 
-        r = requests.post(host + '/api/v1/service/vault_backup/create',
+        r = requests.post(host + '/api/v2/service/vault_backup/create',
                           json=param,
                           headers={"Content-Type": "application/json", "Authorization": "token " + token})
         self.assert200(r.status_code)
@@ -196,7 +194,7 @@ class HiveBackupTestCase(unittest.TestCase):
     def active_backup_hive_node(self):
         param = {}
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/backup/activate_to_vault',
+            self.test_client.post('/api/v2/backup/activate_to_vault',
                                   data=json.dumps(param),
                                   headers=self.auth)
         )
@@ -205,7 +203,7 @@ class HiveBackupTestCase(unittest.TestCase):
     def init_vault_service(self):
         param = {}
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/service/vault/create',
+            self.test_client.post('/api/v2/service/vault/create',
                                   data=json.dumps(param),
                                   headers=self.auth)
         )
@@ -215,10 +213,9 @@ class HiveBackupTestCase(unittest.TestCase):
 
     def test_5_get_backup_state(self):
         r, s = self.parse_response(
-            self.test_client.get('api/v1/backup/state', headers=self.auth)
+            self.test_client.get('api/v2/backup/state', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
 
     def delete_backup_file(self, file_name):
@@ -242,7 +239,6 @@ class HiveBackupTestCase(unittest.TestCase):
                                  headers=self.upload_auth)
         )
         self.assert200(s)
-        self.assertEqual(r2["_status"], "OK")
 
     def get_backup_file(self, file_name):
         get_file_url = INTER_BACKUP_FILE_URL + "?file=" + file_name

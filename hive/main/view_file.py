@@ -1,6 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, request
 
 from hive.main.hive_file import HiveFile
+from hive.main.interceptor import get_pre_proc, pre_proc
+from hive.util.constants import VAULT_ACCESS_WR, VAULT_ACCESS_R, VAULT_ACCESS_DEL
 
 h_file = HiveFile()
 
@@ -12,42 +14,58 @@ def init_app(app):
     app.register_blueprint(hive_file)
 
 
-@hive_file.route('/api/v1/files/upload/<path:file_name>', methods=['POST'])
+@hive_file.route('/api/v2/vault/files/<path:file_name>', methods=['PUT'])
 def upload_file(file_name):
-    return h_file.upload_file(file_name)
+    did, app_id, response = pre_proc(h_file.response, access_vault=VAULT_ACCESS_WR)
+    if response is not None:
+        return response
+    return h_file.upload_file(did, app_id, file_name)
 
 
-@hive_file.route('/api/v1/files/download', methods=['GET'])
-def download_file():
-    return h_file.download_file()
+@hive_file.route('/api/v2/vault/files', defaults={'file_name': '/'}, methods=['GET'])
+@hive_file.route('/api/v2/vault/files/<path:file_name>', methods=['GET'])
+def get_file(file_name):
+    did, app_id, response = pre_proc(h_file.response, access_vault=VAULT_ACCESS_R)
+    if response is not None:
+        return response
+
+    op = request.args.get('comp')
+    if op is None:
+        if file_name:
+            return h_file.download_file(did, app_id, file_name)
+        # else:
+        # todo
+        # return h_file.response.response_err()
+    elif op == "metadata":
+        return h_file.get_property(did, app_id, file_name)
+    elif op == "children":
+        return h_file.list_files(did, app_id, file_name)
+    elif op == "hash":
+        return h_file.file_hash(did, app_id, file_name)
 
 
-@hive_file.route('/api/v1/files/delete', methods=['POST'])
-def remove():
-    return h_file.delete()
+@hive_file.route('/api/v2/vault/files', defaults={'file_name': None}, methods=['DELETE'])
+@hive_file.route('/api/v2/vault/files/<path:file_name>', methods=['DELETE'])
+def remove(file_name):
+    did, app_id, response = pre_proc(h_file.response, access_vault=VAULT_ACCESS_DEL)
+    if response is not None:
+        return response
+    return h_file.delete(did, app_id, file_name)
 
 
-@hive_file.route('/api/v1/files/move', methods=['POST'])
-def move_files():
-    return h_file.move(is_copy=False)
+@hive_file.route('/api/v2/vault/files/<path:src_name>', methods=['PATCH'])
+def move_files(src_name):
+    did, app_id, content, response = get_pre_proc(h_file.response, "to", access_vault=VAULT_ACCESS_WR)
+    if response is not None:
+        return response
+    dst_name = content["to"]
+    return h_file.move(did, app_id, src_name, dst_name, is_copy=False)
 
 
-@hive_file.route('/api/v1/files/copy', methods=['POST'])
-def copy_files():
-    return h_file.move(is_copy=True)
-
-
-@hive_file.route('/api/v1/files/properties', methods=['GET'])
-def file_info():
-    return h_file.get_property()
-
-
-@hive_file.route('/api/v1/files/list/folder', methods=['GET'])
-def list_files():
-    return h_file.list_files()
-
-
-@hive_file.route('/api/v1/files/file/hash', methods=['GET'])
-def get_file_hash():
-    return h_file.file_hash()
-
+@hive_file.route('/api/v2/vault/files/<path:src_name>', methods=['POST'])
+def copy_files(src_name):
+    did, app_id, content, response = get_pre_proc(h_file.response, "dst", access_vault=VAULT_ACCESS_WR)
+    if response is not None:
+        return response
+    dst_name = content["dst"]
+    return h_file.move(did, app_id, src_name, dst_name, is_copy=True)

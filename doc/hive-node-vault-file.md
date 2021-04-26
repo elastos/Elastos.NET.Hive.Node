@@ -1,244 +1,165 @@
 # Vault File
 ## Upload file
-```YAML
-HTTP: POST
-URL: /api/v1/files/upload/path_of_file_name
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-data: file data
-return:
-    Success: {"_status":"OK"}
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "vault have been freeze, can not write")
-    (BAD_REQUEST, "not enough storage space")
-    (NOT_FOUND, "file name is a directory")
-    (INTERNAL_SERVER_ERROR, Exception message)
-```
+* Endpoint: /api/v2/vault/files/<path/to/res>
+* Method: PUT
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Request-Body: 
+    - file data
+* Response:
+    - HTTP/1.1 201
+* Example
+    ```YAML
+        Request:
+            PUT /api/v2/vault/files/some/path/of/file
+            upload file data
+        Response:
+            HTTP/1.1 201 
+    ```
 
 ## Download file
-```YAML
-HTTP: GET
-URL: /api/v1/files/download?path="path/of/file/file.name"
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-return:
-    Success: file data
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-comment: support content range
-error code:
-    UNAUTHORIZED
-    FORBIDDEN
-    INTERNAL_SERVER_ERROR
-    NOT_FOUND
-```
+* Endpoint: /api/v2/vault/files/<path/to/res>
+* Method: GET
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Request-Body: None
+* Response:
+    - HTTP/1.1 200
+    - file data
+* Example
+    ```YAML
+    Request:
+        GET /api/v2/vault/files/some/path/of/file
+    Response:
+        HTTP/1.1 200
+        file data
+    ```
 
 ## Delete file or folder
-```YAML
-HTTP: POST
-URL: /api/v1/files/delete
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-data: {"path": "path/of/delete/file/or/folder"}
-return:
-    Success: {"_status":"OK"}
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "vault have been freeze, can not write")
-    (BAD_REQUEST, "parameter is not application/json") 
-    (BAD_REQUEST, "parameter is null") 
-    (INTERNAL_SERVER_ERROR, Exception message)
-```
+* Endpoint: /api/v2/vault/files/<path/to/res>
+* Method: DELETE 
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Content-Type: "application/json"
+* Response:
+    - HTTP/1.1 204
+* Example
+    ```YAML
+    Request:
+        DELETE /api/v2/vault/files/some/path/of/file
+    Response:
+        HTTP/1.1 204
+    ```
 
 ## Move file or folder
-```YAML
-HTTP: POST
-URL: /api/v1/files/move
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-data:
-    {
-      "src_path": "path/of/src/folder/or/file",
-      "dst_path": "path/of/dst/folder/or/file",
-    }
-return:
-    Success: {"_status":"OK"}
-    Failure:
+* Endpoint: /api/v2/vault/files/<path/to/res>?to=/path/to/dest
+* Method: PATCH
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Content-Type: "application/json"
+* Response:
+    - HTTP/1.1 200
+    - name: new path of file
+* Example:
+    ```YAML
+    Request:
+        PATCH /api/v2/vault/files/some/path/of/file?to=/path/to/dest
+    Response:
+        HTTP/1.1 200
         {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
+          "name": "/path/to/dest"
         }
-comment: usage like shell command "mv"
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "vault have been freeze, can not write")
-    (BAD_REQUEST, "not enough storage space")
-    (BAD_REQUEST, "parameter is not application/json") 
-    (BAD_REQUEST, "parameter is null") 
-    (NOT_FOUND, "src_name not exists")
-    (METHOD_NOT_ALLOWED, "dst_name file exists")
-    (INTERNAL_SERVER_ERROR, "make dst parent path dir error")
-    (INTERNAL_SERVER_ERROR, exception message)
-```
+    ```
 
 ## Copy file or folder
-```YAML
-HTTP: POST
-URL: /api/v1/files/copy
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-data:
-    {
-      "src_path": "path/of/src/folder/or/file",
-      "dst_path": "path/of/dst/folder/or/file",
-    }
-return:
-    Success: {"_status":"OK"}
-    Failure:
+* Endpoint: /api/v2/vault/files/<path/to/res>?dst=/path/to/dst
+* Method: PUT
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Content-Type: "application/json"
+* Response:
+    - HTTP/1.1 200
+    - name: new file path
+* Example:
+    ```YAML
+    Request:
+        PUT /api/v2/vault/files/some/path/of/file?dst=/path/to/dst
+    Response:
+        HTTP/1.1 200
         {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
+          "name": "/path/to/dst"
         }
-comment: usage like shell command "cp"
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "vault have been freeze, can not write")
-    (BAD_REQUEST, "not enough storage space")
-    (BAD_REQUEST, "parameter is not application/json") 
-    (BAD_REQUEST, "parameter is null") 
-    (NOT_FOUND, "src_name not exists")
-    (METHOD_NOT_ALLOWED, "dst_name file exists")
-    (INTERNAL_SERVER_ERROR, "make dst parent path dir error")
-    (INTERNAL_SERVER_ERROR, exception message)
-```
+    ```
 
 ## Get properties of file or folder
-```YAML
-HTTP: GET
-URL: api/v1/files/properties?path="file.or.folder.name"
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-return:
-    Success:
-        {
-            "_status": "OK",
-            "type": file/folder,
-            "name": "file_or_folder_name",
-            "size": 230,
-            "last_modify": 123012.2342,
-        }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "parameter is null") 
-    (NOT_FOUND, "src_name not exists")
-    (METHOD_NOT_ALLOWED, "file not exists")
-    (INTERNAL_SERVER_ERROR, "make dst parent path dir error")
-    (INTERNAL_SERVER_ERROR, exception message)
-```
+* Endpoint: api/v2/vault/files/<path/to/res>?comp=metadata
+* Method: GET
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Content-Type: "application/json"
+* Response:
+    - HTTP/1.1 200
+    - name: file name with full path
+    - size: file size or folder size
+    - updated: updated timestamp
+    - created: created timestamp
+* Example:
+    ```YAML
+        Request:
+            GET /api/v2/vault/files/some/path/of/file?comp=metadata
+        Response:
+            HTTP/1.1 200
+            {
+                "name": "file_or_folder_name",
+                "size": 230,
+                "updated": "timestamp",
+                "created": "timestamp"
+            }
+    ```
 
 ## List folder
-```YAML
-HTTP: GET
-URL: /api/v1/files/list/folder?path="folder.name"
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-return:
-    Success:
-        {
-          "_status": "OK",
-          "file_info_list":[
+* Endpoint: /api/v2/vault/files/<path/to/dir>?comp=children
+* Method: GET
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Content-Type: "application/json"
+* Response:
+    - HTTP/1.1 200
+    - name: file name
+    - size: file or folder size
+    - is_file: true: file; false: folder.
+* Example:
+    ```YAML
+        Request:
+            GET /api/v2/vault/files/path/of/dir?comp=children
+        Response:
+        - HTTP/1.1 200
+        [
             {
-              "type": file/folder,
-              "name": "file_name",
-              "size": 230
-              "last_modify": 123012.2342,
+                "name": "file_name",
+                "size": 230,
+                "is_file": true
             },
             {
-              "type": folder,
-              "name": "folder_name",
-              "size": 230
-              "last_modify": 123012.2342,
-              },
-            ]
-        }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (NOT_FOUND, "folder not exists")
-```
+                "name": "folder_name",
+                "size": 330,
+                "is_file": false 
+            },
+        ]
+    ```
 
 ## Get file hash(SHA256)
+* Method: GET
+* Endpoint: /api/v2/vault/files/<path/to/file>?comp=hash
+* Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
+* Content-Type: "application/json"
+* Response:
+    - HTTP/1.1 200
+    - name: file name
+    - hash: file sha256 hash
+
+* Example:
 ```YAML
-HTTP: GET
-URL: /api/v1/files/file/hash?path="path/of/file/name/"
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-return:
-    Success:
+        Request:
+            GET /api/v2/vault/files/path/of/file?comp=hash
+        Response:
+        - HTTP/1.1 200
         {
-          "_status": "OK",
-          "SHA256": "3a29a81d7b2718a588a5f6f3491b3c578a5f6f3491b3c578a5f6f3491b3c578a5f6f3491b3c57"
+            "name": "new-item-name.txt",
+            "hash": "3a29a81d7b2718a588a5f6f3491b3c578a5f6f3491b3c578a5f6f3491b3c578a5f6f3491b3c57"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "parameter is null") 
-    (NOT_FOUND, "file not exists")
 ```
 

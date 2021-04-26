@@ -123,7 +123,7 @@ class HiveAuthTestCase(unittest.TestCase):
     def test_a_echo(self):
         logging.getLogger("HiveAuthTestCase").debug("\nRunning test_a_echo")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/echo',
+            self.test_client.post('/api/v2/echo',
                                   data=json.dumps({"key": "value"}),
                                   headers=self.json_header)
         )
@@ -137,14 +137,13 @@ class HiveAuthTestCase(unittest.TestCase):
         logging.getLogger("HiveAuthTestCase").debug(f"\ndoc_str: {doc_str}")
         doc = json.loads(doc_str)
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/did/sign_in',
+            self.test_client.post('/api/v2/did/sign_in',
                                   data=json.dumps({
                                       "document": doc,
                                   }),
                                   headers=self.json_header)
         )
         self.assert200(s)
-        self.assertEqual(rt["_status"], "OK")
         jwt = rt["challenge"]
         # print(jwt)
         jws = lib.DefaultJWSParser_Parse(jwt.encode())
@@ -164,14 +163,13 @@ class HiveAuthTestCase(unittest.TestCase):
         logging.getLogger("HiveAuthTestCase").debug(f"\nauth_token: {auth_token}")
 
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/did/auth',
+            self.test_client.post('/api/v2/did/auth',
                                   data=json.dumps({
                                       "jwt": auth_token,
                                   }),
                                   headers=self.json_header)
         )
         self.assert200(s)
-        self.assertEqual(rt["_status"], "OK")
 
         token = rt["access_token"]
         jws = lib.DefaultJWSParser_Parse(token.encode())
@@ -190,11 +188,10 @@ class HiveAuthTestCase(unittest.TestCase):
             self.content_type,
         ]
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/did/check_token',
+            self.test_client.post('/api/v2/did/check_token',
                                   headers=self.json_header)
         )
         self.assert200(s)
-        self.assertEqual(rt["_status"], "OK")
         return token, hive_did
 
     #test sign in auth

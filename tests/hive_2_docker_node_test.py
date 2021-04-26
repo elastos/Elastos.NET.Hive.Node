@@ -100,7 +100,7 @@ class Hive2NodeTest(unittest.TestCase):
         doc = json.loads(doc_str)
 
         param = {"document": doc}
-        r = requests.post(host + '/api/v1/did/sign_in',
+        r = requests.post(host + '/api/v2/did/sign_in',
                           json=param,
                           headers=self.json_header())
         self.assert200(r.status_code)
@@ -126,7 +126,7 @@ class Hive2NodeTest(unittest.TestCase):
         param = {
             "jwt": auth_token,
         }
-        r = requests.post(host + '/api/v1/did/auth',
+        r = requests.post(host + '/api/v2/did/auth',
                           json=param,
                           headers=self.json_header())
         self.assert200(r.status_code)
@@ -144,7 +144,7 @@ class Hive2NodeTest(unittest.TestCase):
 
         # auth_check
         # token = test_common.get_auth_token()
-        r = requests.post(host + '/api/v1/did/check_token',
+        r = requests.post(host + '/api/v2/did/check_token',
                           json=param,
                           headers=self.auth_header(token))
         self.assert200(r.status_code)
@@ -156,14 +156,14 @@ class Hive2NodeTest(unittest.TestCase):
 
     def init_vault_service(self, host, token):
         param = {}
-        r = requests.post(host + '/api/v1/service/vault/create',
+        r = requests.post(host + '/api/v2/service/vault/create',
                           json=param,
                           headers={"Content-Type": "application/json", "Authorization": "token " + token})
         self.assert200(r.status_code)
 
     def init_backup_service(self, host, token):
         param = {}
-        r = requests.post(host + '/api/v1/service/vault_backup/create',
+        r = requests.post(host + '/api/v2/service/vault_backup/create',
                           json=param,
                           headers={"Content-Type": "application/json", "Authorization": "token " + token})
         self.assert200(r.status_code)
@@ -173,23 +173,22 @@ class Hive2NodeTest(unittest.TestCase):
         temp.write(data.encode(encoding="utf-8"))
         temp.seek(0)
         temp.name = 'temp.txt'
-        upload_file_url = "/api/v1/files/upload/" + file_name
+        upload_file_url = "/api/v2/files/upload/" + file_name
         r = requests.post(host + upload_file_url,
                           data=temp,
                           headers=self.upload_header(token))
         self.assert200(r.status_code)
         rt = r.json()
-        self.assertEqual(rt["_status"], "OK")
 
     def upsert_collection(self, host, token, col_name, doc):
-        r = requests.post(host + '/api/v1/db/create_collection',
+        r = requests.post(host + '/api/v2/db/create_collection',
                           json={
                               "collection": col_name
                           },
                           headers=self.auth_header(token))
         self.assert200(r.status_code)
 
-        r = requests.post(host + '/api/v1/db/insert_one',
+        r = requests.post(host + '/api/v2/db/insert_one',
                           json={
                               "collection": col_name,
                               "document": doc,
@@ -209,7 +208,7 @@ class Hive2NodeTest(unittest.TestCase):
         self.create_upload_file(host, token, "f2/f1/test2_2.txt", "this is a test 2_2 file")
 
     def check_vault_data(self, host, token):
-        r = requests.post(host + '/api/v1/db/find_many',
+        r = requests.post(host + '/api/v2/db/find_many',
                           json={
                               "collection": "works"
                           },
@@ -217,13 +216,13 @@ class Hive2NodeTest(unittest.TestCase):
         self.assert200(r.status_code)
         # print(r.json())
 
-        r1 = requests.get(host + '/api/v1/files/list/folder',
+        r1 = requests.get(host + '/api/v2/files/list/folder',
                           headers=self.auth_header(token))
         self.assert200(r1.status_code)
         # print(r1.json())
 
     def clean_vault_data(self, host, token):
-        r = requests.post(host + '/api/v1/db/delete_collection',
+        r = requests.post(host + '/api/v2/db/delete_collection',
                           json={
                               "collection": "works"
                           },
@@ -232,7 +231,7 @@ class Hive2NodeTest(unittest.TestCase):
 
         time.sleep(2)
 
-        r = requests.post(host + '/api/v1/db/find_many',
+        r = requests.post(host + '/api/v2/db/find_many',
                           json={
                               "collection": "works"
                           },
@@ -240,7 +239,7 @@ class Hive2NodeTest(unittest.TestCase):
 
         self.assertEqual(NOT_FOUND, r.status_code)
 
-        r = requests.post(host + '/api/v1/files/delete',
+        r = requests.post(host + '/api/v2/files/delete',
                           json={
                               "path": "/"
                           },
@@ -249,11 +248,11 @@ class Hive2NodeTest(unittest.TestCase):
 
         time.sleep(2)
 
-        r = requests.get(host + '/api/v1/files/list/folder', headers=self.auth_header(token))
+        r = requests.get(host + '/api/v2/files/list/folder', headers=self.auth_header(token))
         self.assertEqual(NOT_FOUND, r.status_code)
 
     def save_to_backup(self, host, token, vc_json):
-        r = requests.post(host + '/api/v1/backup/save_to_node',
+        r = requests.post(host + '/api/v2/backup/save_to_node',
                           json={
                               "backup_credential": vc_json,
                           },
@@ -261,7 +260,7 @@ class Hive2NodeTest(unittest.TestCase):
         self.assert200(r.status_code)
 
         for i in range(0, 3):
-            r1 = requests.get(host + '/api/v1/backup/state',
+            r1 = requests.get(host + '/api/v2/backup/state',
                               headers=self.auth_header(token))
             self.assert200(r1.status_code)
             rt = r1.json()
@@ -274,7 +273,7 @@ class Hive2NodeTest(unittest.TestCase):
         self.assertTrue(False)
 
     def restore_from_backup(self, host, token, vc_json):
-        r = requests.post(host + '/api/v1/backup/restore_from_node',
+        r = requests.post(host + '/api/v2/backup/restore_from_node',
                           json={
                               "backup_credential": vc_json,
                           },
@@ -282,7 +281,7 @@ class Hive2NodeTest(unittest.TestCase):
         self.assert200(r.status_code)
 
     def active_backup_vault(self, host, token):
-        r = requests.post(host + '/api/v1/backup/activate_to_vault',
+        r = requests.post(host + '/api/v2/backup/activate_to_vault',
                           json={
                           },
                           headers=self.auth_header(token))

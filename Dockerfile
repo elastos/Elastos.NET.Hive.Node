@@ -15,6 +15,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt && \
     pip install gunicorn
 
+RUN mkdir -p /root/.config/rclone/
 RUN touch /root/.config/rclone/rclone.conf
 
 ADD . /src/

@@ -82,15 +82,13 @@ class HiveManageTestCase(unittest.TestCase):
     def test_1_get_info(self):
         logging.getLogger("HiveManageTestCase").debug("\nRunning test_1_get_info")
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/hive/version', headers=self.json_header)
+            self.test_client.get('/api/v2/hive/version', headers=self.json_header)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/hive/commithash', headers=self.json_header)
+            self.test_client.get('/api/v2/hive/commithash', headers=self.json_header)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
 
 if __name__ == '__main__':

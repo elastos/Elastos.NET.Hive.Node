@@ -16,7 +16,7 @@ from hive.util.payment.vault_backup_service_manage import get_vault_backup_servi
 from hive.util.payment.vault_service_manage import can_access_backup
 from hive.util.pyrsync import patchstream, gene_blockchecksums, rsyncdelta
 from hive.util.vault_backup_info import *
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 from hive.main.interceptor import post_json_param_pre_proc, did_post_json_param_pre_proc, pre_proc, \
     did_get_param_pre_proc
 
@@ -30,7 +30,7 @@ class HiveInternal:
 
     def __init__(self):
         self.app = None
-        self.response = ServerResponse("HiveInternal")
+        self.response = ServerResponseV2("HiveInternal")
         self.backup_ftp = None
 
     def init_app(self, app, mode):

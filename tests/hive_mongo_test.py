@@ -84,7 +84,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
     def create_collection(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_create_collection")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/create_collection',
+            self.test_client.post('/api/v2/db/create_collection',
                                   data=json.dumps(
                                       {
                                           "collection": "works"
@@ -93,10 +93,9 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/create_collection',
+            self.test_client.post('/api/v2/db/create_collection',
                                   data=json.dumps(
                                       {
                                           "collection": "works"
@@ -111,7 +110,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
     def test_2_insert_one(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_2_insert_one")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/insert_one',
+            self.test_client.post('/api/v2/db/insert_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -125,12 +124,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_3_insert_many(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_3_insert_many")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/insert_many',
+            self.test_client.post('/api/v2/db/insert_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -154,12 +152,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_4_count_documents(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_8_count_documents")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/count_documents',
+            self.test_client.post('/api/v2/db/count_documents',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -176,12 +173,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_5_find_one(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_9_find_one")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/find_one',
+            self.test_client.post('/api/v2/db/find_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -202,12 +198,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_6_1_find_one_null_filter(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_9_1_find_one_null_filter")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/find_one',
+            self.test_client.post('/api/v2/db/find_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -225,12 +220,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_7_find_many(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_10_find_many")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/find_many',
+            self.test_client.post('/api/v2/db/find_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -252,12 +246,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_8_find_many_none_filter(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_10_find_many_none_filter")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/find_many',
+            self.test_client.post('/api/v2/db/find_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -276,12 +269,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_9_update_one(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_4_update_one")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/update_one',
+            self.test_client.post('/api/v2/db/update_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -301,12 +293,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_10_update_many(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_5_update_many")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/update_many',
+            self.test_client.post('/api/v2/db/update_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -326,12 +317,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_11_delete_one(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_6_delete_one")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/delete_one',
+            self.test_client.post('/api/v2/db/delete_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -343,12 +333,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_12_delete_many(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_7_delete_many")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/delete_many',
+            self.test_client.post('/api/v2/db/delete_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -360,12 +349,11 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_13_delete_collection(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_2_delete_collection")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/delete_collection',
+            self.test_client.post('/api/v2/db/delete_collection',
                                   data=json.dumps(
                                       {
                                           "collection": "works"
@@ -374,10 +362,9 @@ class HiveMongoDbTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/insert_one',
+            self.test_client.post('/api/v2/db/insert_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -393,7 +380,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/insert_many',
+            self.test_client.post('/api/v2/db/insert_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -419,7 +406,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/update_one',
+            self.test_client.post('/api/v2/db/update_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -441,7 +428,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/update_many',
+            self.test_client.post('/api/v2/db/update_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -463,7 +450,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/delete_one',
+            self.test_client.post('/api/v2/db/delete_one',
                                   data=json.dumps(
                                       {
                                           "collection": "works",
@@ -477,7 +464,7 @@ class HiveMongoDbTestCase(unittest.TestCase):
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/delete_many',
+            self.test_client.post('/api/v2/db/delete_many',
                                   data=json.dumps(
                                       {
                                           "collection": "works",

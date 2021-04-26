@@ -14,7 +14,7 @@ from hive.util.did_info import add_did_nonce_to_db, create_nonce, get_did_info_b
     get_did_info_by_app_instance_did, update_did_info_by_app_instance_did, \
     update_token_of_did_info
 from hive.util.error_code import UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 from hive.settings import hive_setting
 from hive.util.constants import DID_INFO_DB_NAME, DID_INFO_REGISTER_COL, DID, APP_ID, DID_INFO_NONCE, DID_INFO_TOKEN, \
     DID_INFO_NONCE_EXPIRED, DID_INFO_TOKEN_EXPIRED, APP_INSTANCE_DID
@@ -32,7 +32,7 @@ class HiveAuth(Entity):
 
     def __init__(self):
         self.app = None
-        self.response = ServerResponse("HiveSync")
+        self.response = ServerResponseV2("HiveSync")
 
     def init_app(self, app):
         self.app = app

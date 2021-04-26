@@ -7,13 +7,13 @@ from hive.util.pubsub.pb_exchanger import pubsub_push_message
 from hive.util.pubsub.publisher import pub_setup_channel, pub_add_subscriber, pub_remove_channel, \
     pub_remove_subscribe, pub_get_pub_channels, pub_get_sub_channels, pub_get_channel
 from hive.util.pubsub.subscriber import sub_setup_message_subscriber, sub_pop_messages, sub_get_message_subscriber
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 
 
 class HivePubSub:
     def __init__(self):
         self.app = None
-        self.response = ServerResponse("HivePubSub")
+        self.response = ServerResponseV2("HivePubSub")
 
     def init_app(self, app):
         self.app = app

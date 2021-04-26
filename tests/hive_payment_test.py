@@ -203,44 +203,39 @@ class HivePaymentTestCase(unittest.TestCase):
     def test_1_get_vault_package_info(self):
         logging.getLogger("").debug("\nRunning test_1_get_vault_package_info")
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_package_info', headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_package_info', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_1_1_get_vault_backup_pricing_plan(self):
         logging.getLogger("").debug("\nRunning test_1_1_get_vault_backup_package_info")
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_backup_plan?name=Rookie', headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_backup_plan?name=Rookie', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_1_1_get_vault_pricing_plan(self):
         logging.getLogger("").debug("\nRunning test_1_1_get_vault_pricing_plan")
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_pricing_plan?name=Rookie', headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_pricing_plan?name=Rookie', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_1_2_get_payment_version(self):
         logging.getLogger("").debug("\nRunning test_1_2_get_payment_version")
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/version', headers=self.auth)
+            self.test_client.get('api/v2/payment/version', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_2_0_create_vault(self):
         logging.getLogger("").debug("\nRunning test_2_0_create_vault")
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/service/vault/create',
+            self.test_client.post('/api/v2/service/vault/create',
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         r, msg = can_access_vault(self.did, VAULT_ACCESS_WR)
         self.assertEqual(r, SUCCESS)
 
@@ -252,29 +247,26 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/create_vault_package_order',
+            self.test_client.post('/api/v2/payment/create_vault_package_order',
                                   data=json.dumps(package),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         order_id = r["order_id"]
 
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         print(r)
 
     def test_3_get_all_order(self):
         logging.getLogger("").debug("\nRunning  test_3_get_all_order")
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_package_order_list', headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_package_order_list', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         print(r)
 
     def test_4_pay_and_start_package_order(self):
@@ -286,12 +278,11 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/pay_vault_package_order',
+            self.test_client.post('/api/v2/payment/pay_vault_package_order',
                                   data=json.dumps(pay_param),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         check_wait_order_tx_job()
         r, msg = can_access_vault(self.did, VAULT_ACCESS_WR)
@@ -313,11 +304,10 @@ class HivePaymentTestCase(unittest.TestCase):
 
     def assert_service_vault_info(self, state):
         r, s = self.parse_response(
-            self.test_client.get('api/v1/service/vault', headers=self.auth)
+            self.test_client.get('api/v2/service/vault', headers=self.auth)
         )
         if state:
             self.assert200(s)
-            self.assertEqual(r["_status"], "OK")
             self.assertEqual(r["vault_service_info"][VAULT_SERVICE_PRICING_USING], state)
         else:
             self.assertEqual(404, s)
@@ -350,23 +340,21 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/create_vault_package_order',
+            self.test_client.post('/api/v2/payment/create_vault_package_order',
                                   data=json.dumps(package),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         order_id = r["order_id"]
 
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         print(r)
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/service/vault/create',
+            self.test_client.post('/api/v2/service/vault/create',
                                   headers=self.auth)
         )
         self.assert200(s)
@@ -381,18 +369,17 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/pay_vault_package_order',
+            self.test_client.post('/api/v2/payment/pay_vault_package_order',
                                   data=json.dumps(pay_param),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         check_wait_order_tx_job()
         self.assert_service_vault_backup_info("Rookie")
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/service/vault_backup/create',
+            self.test_client.post('/api/v2/service/vault_backup/create',
                                   headers=self.auth)
         )
         self.assert200(s)
@@ -400,10 +387,9 @@ class HivePaymentTestCase(unittest.TestCase):
 
     def assert_service_vault_backup_info(self, state):
         r, s = self.parse_response(
-            self.test_client.get('api/v1/service/vault_backup', headers=self.auth)
+            self.test_client.get('api/v2/service/vault_backup', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         self.assertEqual(r["vault_service_info"][VAULT_BACKUP_SERVICE_USING], state)
 
     def test_7_create_package_order(self):
@@ -414,20 +400,18 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/create_vault_package_order',
+            self.test_client.post('/api/v2/payment/create_vault_package_order',
                                   data=json.dumps(package),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         order_id = r["order_id"]
 
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         print(r)
 
     def test_8_pay_and_start_backup_order(self):
@@ -439,22 +423,20 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/pay_vault_package_order',
+            self.test_client.post('/api/v2/payment/pay_vault_package_order',
                                   data=json.dumps(pay_param),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         check_wait_order_tx_job()
         self.assert_service_vault_backup_info("Rookie")
 
     def assert_service_vault_backup_info(self, state):
         r, s = self.parse_response(
-            self.test_client.get('api/v1/service/vault/backup', headers=self.auth)
+            self.test_client.get('api/v2/service/vault/backup', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         self.assertEqual(r["vault_service_info"][VAULT_BACKUP_SERVICE_USING], state)
 
     def test_7_create_package_order(self):
@@ -465,20 +447,18 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/create_vault_package_order',
+            self.test_client.post('/api/v2/payment/create_vault_package_order',
                                   data=json.dumps(package),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         order_id = r["order_id"]
 
         r, s = self.parse_response(
-            self.test_client.get('api/v1/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
+            self.test_client.get('api/v2/payment/vault_package_order?order_id=' + order_id, headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         print(r)
 
     def test_8_pay_and_start_backup_order(self):
@@ -490,17 +470,16 @@ class HivePaymentTestCase(unittest.TestCase):
         }
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/payment/pay_vault_package_order',
+            self.test_client.post('/api/v2/payment/pay_vault_package_order',
                                   data=json.dumps(pay_param),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         check_wait_order_tx_job()
         self.assert_service_vault_backup_info("Rookie")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/service/vault_backup/create',
+            self.test_client.post('/api/v2/service/vault_backup/create',
                                   headers=self.auth)
         )
         self.assert200(s)
@@ -508,10 +487,9 @@ class HivePaymentTestCase(unittest.TestCase):
 
     def assert_service_vault_backup_info(self, state):
         r, s = self.parse_response(
-            self.test_client.get('api/v1/service/vault_backup', headers=self.auth)
+            self.test_client.get('api/v2/service/vault_backup', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         self.assertEqual(r["vault_service_info"][VAULT_BACKUP_SERVICE_USING], state)
 
 

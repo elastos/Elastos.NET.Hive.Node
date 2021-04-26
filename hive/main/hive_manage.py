@@ -1,5 +1,5 @@
 from hive.settings import hive_setting
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 
 import logging
 
@@ -9,7 +9,7 @@ logger = logging.getLogger("HiveManage")
 class HiveManage:
     def __init__(self):
         self.app = None
-        self.response = ServerResponse("HiveManage")
+        self.response = ServerResponseV2("HiveManage")
 
     def init_app(self, app):
         self.app = app

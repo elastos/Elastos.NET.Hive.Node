@@ -136,7 +136,7 @@ class Entity:
         doc_str = ffi.string(lib.DIDDocument_ToJson(doc, True)).decode()
         doc = json.loads(doc_str)
 
-        rt, status_code, err = self.post(base_url + '/api/v1/did/sign_in', {"document": doc})
+        rt, status_code, err = self.post(base_url + '/api/v2/did/sign_in', {"document": doc})
 
         if err != None:
             return None, None, "Post sign_in error: " + err
@@ -175,7 +175,7 @@ class Entity:
         return auth_token, hive_did, None
 
     def get_backup_auth_from_node(self, base_url, auth_token, hive_did):
-        rt, status_code, err = self.post(base_url + '/api/v1/did/backup_auth', {"jwt": auth_token})
+        rt, status_code, err = self.post(base_url + '/api/v2/did/backup_auth', {"jwt": auth_token})
         if err != None:
             return None, "Post backup_auth error: " + err
 

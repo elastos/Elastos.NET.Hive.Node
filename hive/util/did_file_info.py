@@ -96,10 +96,11 @@ def query_properties(did, app_id, name):
     stat_info = full_path_name.stat()
 
     data = {
-        "type": "file" if full_path_name.is_file() else "folder",
         "name": name,
+        "is_file": full_path_name.is_file(),
         "size": stat_info.st_size,
-        "last_modify": stat_info.st_mtime,
+        "created": stat_info.st_ctime,
+        "updated": stat_info.st_mtime,
     }
     return data, err
 
@@ -123,7 +124,11 @@ def query_hash(did, app_id, name):
             if not data:
                 break
             sha.update(data)
-    data = {"SHA256": sha.hexdigest()}
+    data = {
+        "name": name,
+        "algorithm": "SHA256",
+        "hash": sha.hexdigest()
+    }
     return data, err
 
 
@@ -145,6 +150,3 @@ def get_dir_size(input_path, total_size):
             total_size += os.path.getsize(i_path)
 
     return total_size
-
-
-

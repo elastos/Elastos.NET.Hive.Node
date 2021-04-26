@@ -10,7 +10,7 @@ from hive.util.did_file_info import get_save_files_path, filter_path_root, query
     query_properties, query_hash, query_upload_get_filepath, get_dir_size
 from hive.util.error_code import INTERNAL_SERVER_ERROR, UNAUTHORIZED, NOT_FOUND, METHOD_NOT_ALLOWED, SUCCESS, FORBIDDEN, \
     BAD_REQUEST
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 from hive.main.interceptor import post_json_param_pre_proc, pre_proc, get_pre_proc
 from hive.util.constants import VAULT_ACCESS_R, VAULT_ACCESS_WR, VAULT_ACCESS_DEL, CHUNK_SIZE
 from hive.util.payment.vault_service_manage import can_access_vault, inc_vault_file_use_storage_byte
@@ -19,7 +19,7 @@ from hive.util.payment.vault_service_manage import can_access_vault, inc_vault_f
 class HiveFile:
     def __init__(self, app=None):
         self.app = app
-        self.response = ServerResponse("HiveFile")
+        self.response = ServerResponseV2("HiveFile")
 
     def init_app(self, app):
         self.app = app
@@ -27,16 +27,8 @@ class HiveFile:
         self.app.config['MAX_CONTENT_PATH'] = 10000000
         self.app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 
-    def move(self, is_copy):
-        did, app_id, content, response = post_json_param_pre_proc(self.response, "src_path", "dst_path",
-                                                                  access_vault=VAULT_ACCESS_WR)
-        if response is not None:
-            return response
-
-        src_name = content.get('src_path')
+    def move(self, did, app_id, src_name, dst_name, is_copy):
         src_name = filter_path_root(src_name)
-
-        dst_name = content.get('dst_path')
         dst_name = filter_path_root(dst_name)
 
         path = get_save_files_path(did, app_id)
@@ -71,11 +63,7 @@ class HiveFile:
 
         return self.response.response_ok()
 
-    def upload_file(self, file_name):
-        did, app_id, response = pre_proc(self.response, access_vault=VAULT_ACCESS_WR)
-        if response is not None:
-            return response
-
+    def upload_file(self, did, app_id, file_name):
         file_name = filter_path_root(file_name)
 
         full_path_name, err = query_upload_get_filepath(did, app_id, file_name)
@@ -100,21 +88,12 @@ class HiveFile:
 
         file_size = os.path.getsize(full_path_name.as_posix())
         inc_vault_file_use_storage_byte(did, file_size)
+        ret = {"name": file_name}
+        return self.response.response_ok(ret, 201)
 
-        return self.response.response_ok()
-
-    def download_file(self):
+    def download_file(self, did, app_id, file_name):
         resp = Response()
-        did, app_id = did_auth()
-        if (did is None) or (app_id is None):
-            resp.status_code = UNAUTHORIZED
-            return resp
-        r, msg = can_access_vault(did, VAULT_ACCESS_R)
-        if r != SUCCESS:
-            resp.status_code = r
-            return resp
 
-        file_name = request.args.get('path')
         data, status_code = query_download(did, app_id, file_name)
         if status_code != SUCCESS:
             resp.status_code = status_code
@@ -122,35 +101,17 @@ class HiveFile:
 
         return data
 
-    def get_property(self):
-        did, app_id, content, response = get_pre_proc(self.response, "path", access_vault=VAULT_ACCESS_R)
-        if response is not None:
-            return response
-
-        name = content['path']
+    def get_property(self, did, app_id, name):
         data, err = query_properties(did, app_id, name)
         if err:
             return self.response.response_err(err["status_code"], err["description"])
 
         return self.response.response_ok(data)
 
-    def list_files(self):
-        did, app_id = did_auth()
-        if (did is None) or (app_id is None):
-            return self.response.response_err(UNAUTHORIZED, "auth failed")
-
-        r, msg = can_access_vault(did, VAULT_ACCESS_R)
-        if r != SUCCESS:
-            return self.response.response_err(r, msg)
-
+    def list_files(self, did, app_id, file_name):
         path = get_save_files_path(did, app_id)
-
-        name = request.args.get('path')
-        if name is None:
-            full_path_name = path
-        else:
-            name = filter_path_root(name)
-            full_path_name = (path / name).resolve()
+        file_name = filter_path_root(file_name)
+        full_path_name = (path / file_name).resolve()
 
         if not (full_path_name.exists() and full_path_name.is_dir()):
             return self.response.response_err(NOT_FOUND, "folder not exists")
@@ -164,38 +125,34 @@ class HiveFile:
         for file in files:
             full_file = full_path_name / file
             stat_info = full_file.stat()
-            file_info = {
-                "type": "file" if full_file.is_file() else "folder",
-                "name": file,
-                "size": stat_info.st_size,
-                "last_modify": stat_info.st_mtime,
-            }
+            if full_file.is_file():
+                file_info = {
+                    "is_file": True,
+                    "name": file,
+                    "size": stat_info.st_size
+                }
+            else:
+                file_info = {
+                    "is_file": False,
+                    "name": file
+                }
             file_info_list.append(file_info)
 
-        return self.response.response_ok({"file_info_list": file_info_list})
+        return self.response.response_ok(file_info_list)
 
-    def file_hash(self):
-        did, app_id, content, response = get_pre_proc(self.response, "path", access_vault=VAULT_ACCESS_R)
-        if response is not None:
-            return response
-
-        name = content['path']
-        data, err = query_hash(did, app_id, name)
+    def file_hash(self, did, app_id, file_name):
+        data, err = query_hash(did, app_id, file_name)
         if err:
             return self.response.response_err(err["status_code"], err["description"])
 
         return self.response.response_ok(data)
 
-    def delete(self):
-        did, app_id, content, response = post_json_param_pre_proc(self.response, "path", access_vault=VAULT_ACCESS_DEL)
-        if response is not None:
-            return response
-
-        filename = content.get('path')
-        filename = filter_path_root(filename)
-
+    def delete(self, did, app_id, file_name):
         path = get_save_files_path(did, app_id)
-        file_full_name = (path / filename).resolve()
+        if file_name:
+            file_full_name = (path / file_name).resolve()
+        else:
+            file_full_name = path.resolve()
         if file_full_name.exists():
             if file_full_name.is_dir():
                 dir_size = 0.0
@@ -207,4 +164,4 @@ class HiveFile:
                 file_full_name.unlink()
                 inc_vault_file_use_storage_byte(did, -file_size)
 
-        return self.response.response_ok()
+        return self.response.response_ok(status_code=204)

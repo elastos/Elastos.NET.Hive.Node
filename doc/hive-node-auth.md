@@ -1,53 +1,44 @@
 # Hive node auth 
-## User auth access request
-```YAML
-HTTP: POST
-URL: /api/v1/did/sign_in
-Content-Type: "application/json"
-data: {"document": did_document}
-return:
-    Success:
+## Sign In
+* Endpoint: /api/v2/did/signin
+* Method: POST
+* Content-Type: "application/json"
+* Request-Body:
+    - id: the user’s DID document
+* Response:
+    - HTTP/1.1 200
+    - challenge: the authentication challenge encoded in JWT
+* Example:
+    ```YAML
+    Request:
+        POST /api/v2/did/signin
         {
-          "_status":"OK",
-          "challenge": jwt,
+            "id": did_document
         }
-    Failure:
+    Response:
+        HTTP/1.1 200
         {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": err_message
-          }
+            "challenge": jwt_data,
         }
-comments: jwt include "nonce"
-error code: 
-    (UNAUTHORIZED, "parameter is not application/json")
-    (BAD_REQUEST, "error message")
-    (INTERNAL_SERVER_ERROR, "error message")
-
-```
+    ```
 ## User auth
-```YAML
-HTTP: POST
-URL: /api/v1/did/auth
-Content-Type: "application/json"
-data: {"jwt": "auth_token"}
-return:
-    Success:
+* Endpoint: /api/v2/did/auth
+* Method: POST
+* Content-Type: "application/json"
+* Request-Body: 
+    - challengeResponse: the response for the authentication challenge encoded in JWT
+* Response:
+    - HTTP/1.1 201
+    - token: the access token encoded in JWT
+* Example:
+    ```YAML
+    Request: 
+        POST /api/v2/did/auth
+        {"challengeResponse": "auth_token"}
+    Response:
+        HTTP/1.1 202 Accepted
         {
-          "_status":"OK",
           "access_token": access_token,
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "err_message"
-          }
-        }
-comments: access_token is a "token", and it is a jwt too.
-error code: 
-    (UNAUTHORIZED, "error message")
-```
+    ```
 

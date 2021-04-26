@@ -85,7 +85,7 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
     def init_collection_for_test(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning init_collection_for_test")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/create_collection',
+            self.test_client.post('/api/v2/db/create_collection',
                                   data=json.dumps(
                                       {
                                           "collection": "groups"
@@ -94,10 +94,9 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/db/insert_one',
+            self.test_client.post('/api/v2/db/insert_one',
                                   data=json.dumps(
                                       {
                                           "collection": "groups",
@@ -109,12 +108,11 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_1_set_script_without_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_1_set_script_without_condition")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/set_script',
+            self.test_client.post('/api/v2/scripting/set_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_no_condition",
@@ -133,12 +131,11 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_2_set_script_with_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_2_set_script_with_condition")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/set_script',
+            self.test_client.post('/api/v2/scripting/set_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_condition",
@@ -168,12 +165,11 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_3_set_script_with_complex_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_3_set_script_with_complex_condition")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/set_script',
+            self.test_client.post('/api/v2/scripting/set_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_complex_condition",
@@ -220,12 +216,11 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_4_set_script_with_anonymous_access(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_1_set_script_with_anonymous_access")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/set_script',
+            self.test_client.post('/api/v2/scripting/set_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_anonymous_access",
@@ -243,12 +238,11 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_5_run_script_without_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_4_run_script_without_condition")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/run_script',
+            self.test_client.post('/api/v2/scripting/run_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_no_condition"
@@ -257,7 +251,6 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_5_1_run_other_user_script_without_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug(
@@ -270,7 +263,7 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
         ]
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/run_script',
+            self.test_client.post('/api/v2/scripting/run_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_no_condition",
@@ -283,27 +276,25 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_6_run_script_with_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_5_run_script_with_condition")
 
         # Set up the pre-requisites to run this test
-        self.test_client.post('/api/v1/db/create_collection',
+        self.test_client.post('/api/v2/db/create_collection',
                               data=json.dumps({"collection": "test_group"}),
                               headers=self.auth)
-        r, s = self.parse_response(self.test_client.post('/api/v1/db/insert_one',
+        r, s = self.parse_response(self.test_client.post('/api/v2/db/insert_one',
                                                          data=json.dumps({"collection": "test_group",
                                                                           "document": {"name": "Trinity",
                                                                                        "friends": [did]}}),
                                                          headers=self.auth))
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         # Run the actual test
         group_id = r["inserted_id"]
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/run_script',
+            self.test_client.post('/api/v2/scripting/run_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_condition",
@@ -315,17 +306,16 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
         # Tear down
-        self.test_client.post('/api/v1/db/delete_collection',
+        self.test_client.post('/api/v2/db/delete_collection',
                               data=json.dumps({"collection": "test_group"}),
                               headers=self.auth)
 
     def test_7_run_script_with_anonymous_access(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_4_run_script_with_anonymous_access")
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/scripting/run_script',
+            self.test_client.post('/api/v2/scripting/run_script',
                                   data=json.dumps(
                                       {
                                           "name": "script_anonymous_access",
@@ -337,17 +327,15 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
                                   ))
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def test_8_run_script_with_url(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_8_run_script_with_url")
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/scripting/run_script_url/'
+            self.test_client.get('/api/v2/scripting/run_script_url/'
                                  'did:elastos:ij8krAVRJitZKJmcCufoLHQjq7Mef3ZjTN@appid/'
                                  'script_anonymous_access')
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
 
 if __name__ == '__main__':

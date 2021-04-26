@@ -27,13 +27,13 @@ from hive.util.did_scripting import check_json_param, run_executable_find, run_c
 from hive.util.error_code import INTERNAL_SERVER_ERROR, BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, SUCCESS
 from hive.util.payment.vault_service_manage import can_access_vault, update_vault_db_use_storage_byte, \
     inc_vault_file_use_storage_byte
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 
 
 class HiveScripting:
     def __init__(self, app=None):
         self.app = app
-        self.response = ServerResponse("HiveScripting")
+        self.response = ServerResponseV2("HiveScripting")
 
     def init_app(self, app):
         self.app = app

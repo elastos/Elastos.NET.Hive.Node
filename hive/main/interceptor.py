@@ -5,7 +5,7 @@ import traceback
 from flask import request
 from hive.util.auth import did_auth
 from hive.util.error_code import INTERNAL_SERVER_ERROR, BAD_REQUEST, UNAUTHORIZED, SUCCESS
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 from hive.util.payment.vault_service_manage import can_access_vault, can_access_backup
 
 
@@ -14,7 +14,7 @@ def init_app(app):
 
 
 def handle_exception_500(e):
-    response = ServerResponse("HiveNode")
+    response = ServerResponseV2("HiveNode")
     logging.getLogger("Hive exception").exception(f"handle_exception_500: {traceback.format_exc()}")
     return response.response_err(INTERNAL_SERVER_ERROR, f"Exception at {str(datetime.utcnow())} error is:{str(e)}")
 

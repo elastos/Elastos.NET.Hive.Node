@@ -1,26 +1,26 @@
 import json
 
-from flask import jsonify
+from flask import jsonify, Response
 import logging
 
-STATUS = "_status"
-STATUS_OK = "OK"
-STATUS_ERR = "ERR"
 
-
-class ServerResponse:
+class ServerResponseV2:
     def __init__(self, logger_name="HiveNode"):
         self.logger = logging.getLogger(logger_name)
 
-    def response_ok(self, data_dic=None):
-        ret = {STATUS: STATUS_OK}
-        if data_dic is not None:
-            ret.update(data_dic)
-        self.logger.debug(json.dumps(ret))
-        return jsonify(ret)
+    def response_ok(self, data_dic=None, status_code=200):
+        if not data_dic:
+            resp = Response()
+            resp.status_code = status_code
+            return resp
+        else:
+            self.logger.debug(json.dumps(data_dic))
+            return jsonify(data_dic), status_code
 
-    def response_err(self, code, msg):
-        ret = {STATUS: STATUS_ERR}
-        ret.update({"_error": {"code": code, "message": msg}})
+    def response_err(self, status_code, msg, code=None):
+        if code:
+            ret = ({"error": {"code": code, "message": msg}})
+        else:
+            ret = ({"error": {"message": msg}})
         self.logger.error(msg)
-        return jsonify(ret), code
+        return jsonify(ret), status_code

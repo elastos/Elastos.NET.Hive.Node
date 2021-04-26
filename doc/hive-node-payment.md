@@ -2,41 +2,34 @@
 
 ## Get payment version 
 ```YAML
-HTTP: GET 
-URL: api/v1/payment/version
+Method: GET 
+Endpoint: /api/v2/payment/version
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-            "_status": "OK",
+            
             "version": "1.0"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
     (BAD_REQUEST, "not enough storage space")
 ```
 
-## Get vault service package payment info
+## Get pricing plan info of all service  
 ```YAML
-HTTP: GET
-URL: api/v1/payment/vault_package_info
+Method: GET
+Endpoint: /api/v2/payment/pricingplan/all
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
         {
-        "_status": "OK",
         "backupPlans": [
         {
         "amount": 0,
@@ -90,73 +83,51 @@ return:
         ],
         "version": "1.0"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
 (UNAUTHORIZED, "auth failed")
 ```
 
 ## Get vault service pricing plan by name
 ```YAML
-HTTP: GET 
-URL: api/v1/payment/vault_pricing_plan?name=Rookie
+Method: GET 
+Endpoint: /api/v2/payment/pricingplan/vault?name=<name>
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-            "_status": "OK",
+            
             "name": "Rookie",
             "maxStorage": 2000,
             "serviceDays": 30,
             "amount": 2.5,
             "currency": "ELA"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed") 
     (BAD_REQUEST, "parameter is null")
     (NOT_FOUND, "not found pricing name")
 ```
 
-## Get vault backup service pricing plan by name
+## Get backup service pricing plan by name
 ```YAML
-HTTP: GET 
-URL: api/v1/payment/vault_backup_plan?name=Rookie
+Method: GET 
+Endpoint: /api/v2/payment/pricingplan/backup?name=<name>
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
         {
-            "_status": "OK",
             "name": "Rookie",
             "maxStorage": 2000,
             "serviceDays": 30,
             "amount": 2.5,
             "currency": "ELA"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+Error-Code:
     (UNAUTHORIZED, "auth failed") 
     (BAD_REQUEST, "parameter is null")
     (NOT_FOUND, "not found backup name")
@@ -164,11 +135,11 @@ error code:
 
 ## Create payment order
 ```YAML
-HTTP: POST
-URL: /api/v1/payment/create_vault_package_order
+Method: POST
+Endpoint: /api/v2/payment/package_order/create
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data: 
+Request-Body: 
     {
       "pricing_name": "Rookie",
     } 
@@ -178,21 +149,12 @@ data:
     } 
     to create a vault backup service order
 
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
       {
-        "_status": "OK",
         "order_id": "5f910273dc81b7a0b3f585fc"
       }
-    Failure: 
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (NOT_FOUND, "not found pricing_name of:" + content["pricing_name"])
     (NOT_FOUND, "not found backup_name of:" + content["backup_name"])
@@ -201,11 +163,11 @@ error code:
 
 ## Pay vault service package order
 ```YAML
-HTTP: POST
-URL: /api/v1/payment/pay_vault_package_order
+Method: POST
+Endpoint: /api/v2/payment/package_order/pay
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data: 
+Request-Body: 
     {
       "order_id": "5f910273dc81b7a0b3f585fc",
       "pay_txids": [
@@ -213,36 +175,31 @@ data:
         "0xablcdef"
       ]
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
       {
-        "_status": "OK",
+        
       }
-    Failure: 
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (BAD_REQUEST, "txid has been used")
 ```
 
-## Get order info of vault service purchase
+## Get order info 
 ```YAML
-HTTP: GET
-URL: api/v1/payment/vault_package_order?order_id=5f910273dc81b7a0b3f585fc
+Method: GET
+Endpoint: /api/v2/payment/package_order?order_id=<order_id>
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-            "_status": "OK",
+            
             "order_info":
             { 
                 "order_id":"5f910273dc81b7a0b3f585fc", 
@@ -265,30 +222,24 @@ return:
                 "finish_time": 1602236366
             }
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
 ```
 
-## Get user order info list of vault service purchase
+## Get history of order info list 
 ```YAML
-HTTP: GET
-URL: api/v1/payment/vault_package_order_list
+Method: GET
+Endpoint: /api/v2/payment/package_order/history
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-            "_status": "OK",
+            
             "order_info_list":[
                 { 
                     "order_id":"5f910273dc81b7a0b3f585fc", 
@@ -312,15 +263,8 @@ return:
                 }
             ]
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
 ```
 

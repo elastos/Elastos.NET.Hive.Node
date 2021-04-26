@@ -1,40 +1,34 @@
 # Hive node manage
 ## Get hive node version
-```YAML
-HTTP: GET
-URL: /api/v1/hive/version
-return:
-    Success:
+* Method: GET
+* Endpoint: /api/v2/hive/version
+* Response:
+    - HTTP/1.1 200
+    - version: hive node version
+* Example:
+    ```YAML
+    Request:
+        GET /api/v2/vault/backup/local/activate
+    Response:
+        HTTP/1.1 200
         {
-            "_status": "OK",
             "version": "1.0.0"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-```
+    ```
 
 ## Get commit hash 
-```YAML
-HTTP: GET
-URL: /api/v1/hive/commithash
-return:
-    Success:
+* Endpoint: /api/v2/hive/commithash
+* Method: GET
+* Response:
+    - HTTP/1.1 200
+    - commit_hash: git commit hash
+* Example:
+    ```YAML
+    Request:
+        GET /api/v2/hive/commithash
+    Response:
+        HTTP/1.1 200
         {
-            "_status": "OK",
             "commit_hash": "279b15650a86b16dcba289e74a09290ff225c69a"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-```
+    ```

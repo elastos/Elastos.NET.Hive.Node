@@ -135,12 +135,11 @@ class HivePubsubTestCase(unittest.TestCase):
             "channel_name": channel_name
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/publish',
+            self.test_client.post('/api/v2/pubsub/publish',
                                   data=json.dumps(data),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def subscribe_channel(self, pub_did, pub_appid, channel_name, token):
         auth = self.get_auth(token)
@@ -150,12 +149,11 @@ class HivePubsubTestCase(unittest.TestCase):
             "channel_name": channel_name
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/subscribe',
+            self.test_client.post('/api/v2/pubsub/subscribe',
                                   data=json.dumps(data),
                                   headers=auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def push_message(self, channel_name, message):
         data = {
@@ -163,12 +161,11 @@ class HivePubsubTestCase(unittest.TestCase):
             "message": message
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/push',
+            self.test_client.post('/api/v2/pubsub/push',
                                   data=json.dumps(data),
                                   headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
 
     def pop_message(self, pub_did, pub_appid, channel_name, limit, token):
         auth = self.get_auth(token)
@@ -179,12 +176,11 @@ class HivePubsubTestCase(unittest.TestCase):
             "message_limit": limit
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/pop',
+            self.test_client.post('/api/v2/pubsub/pop',
                                   data=json.dumps(data),
                                   headers=auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         return r["messages"]
 
     def test_publish_and_subscribe(self):
@@ -193,10 +189,9 @@ class HivePubsubTestCase(unittest.TestCase):
         self.publish_channel("test_channel2")
 
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/pubsub/pub/channels', headers=self.auth)
+            self.test_client.get('/api/v2/pubsub/pub/channels', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         channels = ["test_channel1", "test_channel2"]
         self.assertTrue(operator.eq(r["channels"], channels))
 
@@ -242,7 +237,7 @@ class HivePubsubTestCase(unittest.TestCase):
             "channel_name": "test_channel1"
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/publish',
+            self.test_client.post('/api/v2/pubsub/publish',
                                   data=json.dumps(data),
                                   headers=self.auth)
         )
@@ -254,21 +249,20 @@ class HivePubsubTestCase(unittest.TestCase):
             "channel_name": "test_channel1"
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/remove',
+            self.test_client.post('/api/v2/pubsub/remove',
                                   data=json.dumps(data),
                                   headers=self.auth)
         )
         self.assert200(s)
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/pubsub/pub/channels', headers=self.auth)
+            self.test_client.get('/api/v2/pubsub/pub/channels', headers=self.auth)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         self.assertTrue(operator.eq(r["channels"], list()))
 
         # remove a not existing channel
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/remove',
+            self.test_client.post('/api/v2/pubsub/remove',
                                   data=json.dumps(data),
                                   headers=self.auth)
         )
@@ -294,22 +288,21 @@ class HivePubsubTestCase(unittest.TestCase):
         }
         auth1 = self.get_auth(token1)
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/unsubscribe',
+            self.test_client.post('/api/v2/pubsub/unsubscribe',
                                   data=json.dumps(data),
                                   headers=auth1)
         )
         self.assert200(s)
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/pubsub/sub/channels', headers=auth1)
+            self.test_client.get('/api/v2/pubsub/sub/channels', headers=auth1)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         self.assertTrue(operator.eq(r["channels"], list()))
 
         # unsubscribe again, should be ok
         auth1 = self.get_auth(token1)
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/unsubscribe',
+            self.test_client.post('/api/v2/pubsub/unsubscribe',
                                   data=json.dumps(data),
                                   headers=auth1)
         )
@@ -323,7 +316,7 @@ class HivePubsubTestCase(unittest.TestCase):
         }
         auth1 = self.get_auth(token1)
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/unsubscribe',
+            self.test_client.post('/api/v2/pubsub/unsubscribe',
                                   data=json.dumps(no_channle),
                                   headers=auth1)
         )
@@ -331,10 +324,9 @@ class HivePubsubTestCase(unittest.TestCase):
 
         auth2 = self.get_auth(token2)
         r, s = self.parse_response(
-            self.test_client.get('/api/v1/pubsub/sub/channels', headers=auth2)
+            self.test_client.get('/api/v2/pubsub/sub/channels', headers=auth2)
         )
         self.assert200(s)
-        self.assertEqual(r["_status"], "OK")
         self.assertTrue(operator.eq(r["channels"], ["test_channel1"]))
 
     def test_subscribe_empty_channel(self):
@@ -351,7 +343,7 @@ class HivePubsubTestCase(unittest.TestCase):
             "channel_name": channel_name
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/subscribe',
+            self.test_client.post('/api/v2/pubsub/subscribe',
                                   data=json.dumps(data),
                                   headers=auth)
         )
@@ -363,7 +355,7 @@ class HivePubsubTestCase(unittest.TestCase):
             "message": "some message"
         }
         r, s = self.parse_response(
-            self.test_client.post('/api/v1/pubsub/push',
+            self.test_client.post('/api/v2/pubsub/push',
                                   data=json.dumps(data),
                                   headers=self.auth)
         )

@@ -7,14 +7,14 @@ from hive.util.payment.vault_order import *
 from hive.util.payment.vault_service_manage import get_vault_service, setup_vault_service, delete_user_vault, \
     freeze_vault, unfreeze_vault
 from hive.util.payment.vault_backup_service_manage import get_vault_backup_service, setup_vault_backup_service
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 from hive.main.interceptor import post_json_param_pre_proc, pre_proc, get_pre_proc
 
 
 class HivePayment:
     def __init__(self):
         self.app = None
-        self.response = ServerResponse("HivePayment")
+        self.response = ServerResponseV2("HivePayment")
 
     def init_app(self, app):
         self.app = app

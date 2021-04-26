@@ -7,11 +7,11 @@
 Note: "$caller_did" is a reserved keyword that will automatically be replaced with the user DID on the backend. You may or may not add the param "output" as part of the executable whether to capture the output of each executable.
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "get_groups",
       "executable": {
@@ -32,24 +32,16 @@ data:
         }
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
         {
-          "_status": "OK",
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa0a116f409b032c1da0b"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -67,11 +59,11 @@ error code:
 Note: "$caller_did" is a reserved keyword that will automatically be replaced with the user DID on the backend and "$params" is a reserved keyword that will automatically fill the parameter value that's passed while calling the script. You may or may not add the param "output" as part of the executable whether to capture the output of each executable.
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "get_group_messages",
       "executable": {
@@ -101,24 +93,18 @@ data:
         }
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa1cf16f409b032c1dad2"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -137,11 +123,11 @@ error code:
 Note: "$caller_did" is a reserved keyword that will automatically be replaced with the user DID on the backend and "$params" is a reserved keyword that will automatically fill the parameter value that's passed while calling the script. You may or may not add the param "output" as part of the executable whether to capture the output of each executable.
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "add_group_message",
       "executable": {
@@ -209,24 +195,18 @@ data:
         ]
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa2be16f409b032c1daf4"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -242,11 +222,11 @@ error code:
 ### Create/Update a script(just for demoing delete and update query)
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "update_group_message_and_delete",
       "executable": {
@@ -302,24 +282,18 @@ data:
         }
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa2be16f409b032c1daf4"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -335,11 +309,11 @@ error code:
 ### Upload a file(just for demoing fileUpload executable query).
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "upload_picture",
       "executable": {
@@ -362,24 +336,18 @@ data:
         }
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa2be16f409b032c1daf4"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -395,11 +363,11 @@ error code:
 ### Download a file(just for demoing fileDownload executable query)
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "download_picture",
       "executable": {
@@ -422,24 +390,18 @@ data:
         }
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa2be16f409b032c1daf4"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -457,11 +419,11 @@ error code:
 NOTE: We are going to allow anonymous access with this script by setting "allowAnonymousUser" to true and "allowAnonymousApp" to true
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/set_script
+Method: POST
+Endpoint: /api/v2/scripting/set_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "get_file_info",
       "allowAnonymousUser": true,
@@ -489,24 +451,18 @@ data:
         ]
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "acknowledged": true,
           "matched_count": 0,
           "modified_count": 0,
           "upserted_id": "5f4aa2be16f409b032c1daf4"
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -524,18 +480,19 @@ error code:
 ### Run a script to get all the groups that the DID user belongs to. As defined by the script, it contains no restriction so anyone is able to retrieve all the groups for a DID user
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script
+Method: POST
+Endpoint: /api/v2/scripting/run_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "get_groups"
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
       {
-        "_status": "OK",
+        
         "get_groups": {
           "items": [
             {
@@ -544,15 +501,8 @@ return:
           ]
         }
       }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (UNAUTHORIZED, "target_did not set")
@@ -577,11 +527,11 @@ error code:
 NOTE: We can use the field "context" along with its inner value "target_did" to tell hive which did user to use when accessing vault and "target_app_did" to tell hive which app did to use when accessing vault. This is necessary when user1 wants to call user2's vault
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script
+Method: POST
+Endpoint: /api/v2/scripting/run_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "get_group_messages",
       "context": {
@@ -592,10 +542,11 @@ data:
         "group_id": {"$oid": "5f497bb83bd36ab235d82e6a"}
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
       {
-        "_status": "OK",
+        
         "find_messages": {
           "items": [
             {
@@ -614,15 +565,8 @@ return:
           ]
         }
       }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (UNAUTHORIZED, "target_did not set")
@@ -644,11 +588,11 @@ error code:
 ### Run a script to add a new message to the group messaging for a particular group id. This has two subconditions that needs to be satisifed first. These subconditions can access the values of "params" as they are. Mongodb queries are allowed as part of these fields.
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script
+Method: POST
+Endpoint: /api/v2/scripting/run_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "add_group_message",
       "params": {
@@ -660,10 +604,11 @@ data:
         "content_created": "2021-08-27 00:00:00"
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
       {
-        "_status": "OK",
+        
         "get_last_message": {
           "items": [
             {
@@ -682,15 +627,8 @@ return:
           ]
         }
       }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (UNAUTHORIZED, "target_did not set")
@@ -714,34 +652,28 @@ error code:
 NOTE: The upload works a bit differently compared to other types of executable queries because there are two steps to this executable. First, you run the script to get a transaction ID and then secondly, you call a second API endpoint to actually upload the file related to that transaction ID
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script
+Method: POST
+Endpoint: /api/v2/scripting/run_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "upload_file",
       "group_id": {"\$oid": "5fc46c9f3409d8a253dd8132"},
         "path": "logging.conf"
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
     {
-      "_status": "OK",
+      
       "upload_file": {
         "transaction_id": "5fc4b654d3ae60e2286f0ac0"
       }
     }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (UNAUTHORIZED, "target_did not set")
@@ -763,21 +695,15 @@ error code:
 Then, run the second API endpoint to upload the file
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script_upload/transaction_id
+Method: POST
+Endpoint: /api/v2/scripting/run_script_upload/transaction_id
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-data: file data
-return:
-    Success: {"_status":"OK"}
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+Request-Body: file data
+Response:
+    - HTTP/1.1 200
+ 
+
+Error-Code:
     (INTERNAL_SERVER_ERROR, "Error while executing file {fileapi_type} via scripting: Could not unpack details from transaction_id jwt token. Exception: {str(e)}")
     (FORBIDDEN, "Error while executing file {fileapi_type} via scripting: vault can not be accessed")
     (NOT_FOUND, "Error while executing file {fileapi_type} via scripting: vault can not be accessed")
@@ -796,11 +722,11 @@ error code:
 NOTE: The download works a bit differently compared to other types of executable queries because there are two steps to this executable. First, you run the script to get a transaction ID and then secondly, you call a second API endpoint to actually download the file related to that transaction ID
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script
+Method: POST
+Endpoint: /api/v2/scripting/run_script
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "download_picture",
       "params": {
@@ -808,23 +734,17 @@ data:
         "path": "kiran.jpg"
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
     {
-      "_status": "OK",
+      
       "download_file": {
         "transaction_id": "5fc4b8ef740754a38ad9fd09"
       }
     }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (UNAUTHORIZED, "target_did not set")
@@ -846,22 +766,16 @@ error code:
 Then, run the second API endpoint to download the file
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script_download/transaction_id
+Method: POST
+Endpoint: /api/v2/scripting/run_script_download/transaction_id
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-data: file data
-return:
-    Success: file data
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
+Request-Body: file data
+Response:
+    - HTTP/1.1 200
+ file data
+
 comment: support content range
-error code:
+Error-Code:
     (INTERNAL_SERVER_ERROR, "Error while executing file {fileapi_type} via scripting: Could not unpack details from transaction_id jwt token. Exception: {str(e)}")
     (FORBIDDEN, "Error while executing file {fileapi_type} via scripting: vault can not be accessed")
     (NOT_FOUND, "Error while executing file {fileapi_type} via scripting: vault can not be accessed")
@@ -880,10 +794,10 @@ NOTE: This is a script where Anonymous options are set to true so we do not need
 However, we MUST pass in the context with "target_did" and "target_app_did"
 
 ```YAML
-HTTP: POST
-URL: /api/v1/scripting/run_script
+Method: POST
+Endpoint: /api/v2/scripting/run_script
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "name": "get_file_info",
       "context": {
@@ -894,10 +808,11 @@ data:
         "path": "logging.conf"
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
       {
-        "_status": "OK",
+        
         "file_hash": {
           "SHA256": "b032e73f4d677a82e932ba106b295365079d123973832c0fc1e06d3900e1fd84"
         },
@@ -908,22 +823,15 @@ return:
           "type": "file"
         }
       }
-    Failure:
-      {
-        "_status": "ERR",
-        "_error": {
-          "code": 401,
-          "message": "Error message"
-        }
-      }
+
 ```
 
 ## Executes a previously registered server side script with a direct URL where the values can be passed as part of the query. Vault owner or external users are allowed to call scripts on someone's vault.
 
-Format of the URL:
+Format of the Endpoint:
 
 ```YAML
-/api/v1/scripting/run_script_url/target_did@target_app_did/script_name?params={key=value}
+/api/v2/scripting/run_script_url/target_did@target_app_did/script_name?params={key=value}
 ```
 
 ### Run a script to get all the group messages for a particular group ID(directly calling the URL). This has a subcondition that needs to be satisifed first. This subcondition can access the values of "params" as they are. Mongodb queries are allowed as part of these fields.
@@ -931,13 +839,14 @@ Format of the URL:
 NOTE: We can use the field "context" along with its inner value "target_did" to tell hive which did user to use when accessing vault and "target_app_did" to tell hive which app did to use when accessing vault. This is necessary when user1 wants to call user2's vault
 
 ```YAML
-HTTP: GET
-URL: /api/v1/scripting/run_script_url/did:elastos:ij8krAVRJitZKJmcCufoLHQjq7Mef3ZjTN@did:elastos:jUdkrAVRJitZKJmcCufoLHQjq7Mef3Zi8L/get_group_messages?params=%7B%20%22group_id%22%3A%20%7B%22%24oid%22%3A%20%22600727f9239421f76705a817%22%7D%2C%20%22path%22%3A%20%22logging.conf%22%7D
+Method: GET
+Endpoint: /api/v2/scripting/run_script_url/did:elastos:ij8krAVRJitZKJmcCufoLHQjq7Mef3ZjTN@did:elastos:jUdkrAVRJitZKJmcCufoLHQjq7Mef3Zi8L/get_group_messages?params=%7B%20%22group_id%22%3A%20%7B%22%24oid%22%3A%20%22600727f9239421f76705a817%22%7D%2C%20%22path%22%3A%20%22logging.conf%22%7D
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
       {
-        "_status": "OK",
+        
         "find_messages": {
           "items": [
             {
@@ -956,15 +865,8 @@ return:
           ]
         }
       }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (UNAUTHORIZED, "target_did not set")

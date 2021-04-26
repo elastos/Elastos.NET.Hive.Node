@@ -1,36 +1,20 @@
 # Vault database
 WARNING: Not support mongoDB generate "_id" filter yet
 ## Create mongoDB collection
-```YAML
-HTTP: POST
-URL: /api/v1/db/create_collection
+Endpoint: /api/v2/vault/db/collection
+Method: PUT
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
-      "collection": "works",
+        "collection": "works",
     }
-return:
-    Success:
-        {
-          "_status": "OK",
-        }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-comments: "collection" is collection name of user's mongoDB.
-if vault exist, it will return
-      {
-        "_status": "OK",
-        "existing": True
-      }
+Response:
+    - HTTP/1.1 201
+    if vault exist, it will return
+    - HTTP/1.1 200
 
-error code:
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -38,33 +22,22 @@ error code:
     (BAD_REQUEST, "parameter is not application/json")
     (BAD_REQUEST, "parameter is null")
     (INTERNAL_SERVER_ERROR, Exception message)
+```YAML
 ```
 
 ## Delete mongoDB collection
 ```YAML
-HTTP: POST
-URL: /api/v1/db/delete_collection
+Method: DELETE
+Endpoint: /api/v2/vault/db/collection
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "collection": "works",
     }
-return:
-    Success:
-        {
-          "_status": "OK",
-        }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-comments: "collection" is collection name of user's mongoDB.
-error code:
+Response:
+    - HTTP/1.1 204
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -79,11 +52,11 @@ error code:
     * options:
         bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/insert_one
+Method: PUT
+Endpoint: /api/v2/vault/db/doc
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "collection": "works",
       "document": {
@@ -92,22 +65,14 @@ data:
       },
       "options": {"bypass_document_validation":false}
     }
-return:
-    Success:
-        {
-          "_status": "OK",
-          "acknowledged": true,
-          "inserted_id": "5edddab688db87875fddc3a5"
-        }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+Response:
+    - HTTP/1.1 201
+    {
+      "acknowledged": true,
+      "inserted_id": "5edddab688db87875fddc3a5"
+    }
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -125,11 +90,11 @@ error code:
         * ordered (optional): If True (the default) documents will be inserted on the server serially, in the order provided. If an error occurs all remaining inserts are aborted. If False, documents will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
         * bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/insert_many
+Method: PUT
+Endpoint: /api/v2/vault/db/docs
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "collection": "works",
       "document": [
@@ -147,25 +112,16 @@ data:
           "ordered":true
       }
     }
-return:
-    Success:
-       {
-        "_status": "OK",
+Response:
+    - HTTP/1.1 201
+    {
         "acknowledged": true,
         "inserted_ids": [
             "5f4658d122c95b17e72f2d4a",
             "5f4658d122c95b17e72f2d4b"
         ]
-        }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+    }
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -184,11 +140,11 @@ error code:
         * upsert (optional): If True, perform an insert if no documents match the filter.
         * bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False. This option is only supported on MongoDB 3.2 and above.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/update_one
+Method: POST
+Endpoint: /api/v2/vault/db/doc
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "collection": "works",
       "filter": {
@@ -203,24 +159,17 @@ data:
           "bypass_document_validation": false
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
         {
-            "_status": "OK",
+            
             "acknowledged": true,
             "matched_count": 1,
             "modified_count": 0,
             "upserted_id": null
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -239,11 +188,11 @@ error code:
         * upsert (optional): If True, perform an insert if no documents match the filter.
         * bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False. This option is only supported on MongoDB 3.2 and above.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/update_many
+Method: POST
+Endpoint: /api/v2/vault/db/docs
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
       "collection": "works",
       "filter": {
@@ -258,24 +207,17 @@ data:
           "bypass_document_validation": false
       }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
     {
-        "_status": "OK",
+        
         "acknowledged": true,
         "matched_count": 10,
         "modified_count": 10,
         "upserted_id": null
     }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.")
     (BAD_REQUEST, "vault have been freeze, can not write")
@@ -290,11 +232,11 @@ error code:
     * collection: collection name.
     * filter: A query that matches the document to delete.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/delete_one
+Method: DELETE
+Endpoint: /api/v2/vault/db/doc
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
         "collection": "works",
         "filter": {
@@ -302,22 +244,13 @@ data:
         }
     }
 
-return:
-    Success:
+Response:
+    - HTTP/1.1 204
     {
-        "_status": "OK",
         "acknowledged": true,
         "deleted_count": 1,
     }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.") 
     (BAD_REQUEST, "vault have been freeze, can not write") 
@@ -331,33 +264,25 @@ error code:
     * collection: collection name.
     * filter: A query that matches the document to delete.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/delete_many
+Method: DELETE
+Endpoint: /api/v2/vault/db/docs
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
         "collection": "works",
         "filter": {
             "author": "john doe1",
         }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 204
     {
-        "_status": "OK",
         "acknowledged": true,
         "deleted_count": 0,
     }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.") 
     (BAD_REQUEST, "vault have been freeze, can not write") 
@@ -376,11 +301,11 @@ error code:
         * limit (int): The maximum number of documents to count. Must be a positive integer. If not provided, no limit is imposed.
         * maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/count_documents
+Method: POST
+Endpoint: /api/v2/vault/db/docs/count
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
         "collection": "works",
         "filter": {
@@ -392,21 +317,15 @@ data:
             "maxTimeMS": 1000000000
         }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
     {
-        "_status": "OK",
+        
         "count": 10
     }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.") 
     (BAD_REQUEST, "parameter is not application/json") 
@@ -431,11 +350,11 @@ error code:
         * show_record_id (optional): If True, adds a field $recordId in each document with the storage engine’s internal record identifier.
         * batch_size (optional): Limits the number of documents returned in a single batch.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/find_one
+Method: POST
+Endpoint: /api/v2/vault/db/doc/find
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
         "collection": "works",
         "filter": {
@@ -451,10 +370,11 @@ data:
             "batch_size": 0
         }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "items": {
             "author": "john doe1_1",
             "title": "Eve for Dummies1_1",
@@ -466,15 +386,8 @@ return:
             }
           }
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.") 
     (BAD_REQUEST, "parameter is not application/json") 
@@ -500,11 +413,11 @@ error code:
         * show_record_id (optional): If True, adds a field $recordId in each document with the storage engine’s internal record identifier.
         * batch_size (optional): Limits the number of documents returned in a single batch.
 ```YAML
-HTTP: POST
-URL: /api/v1/db/find_many
+Method: POST
+Endpoint: /api/v2/vault/db/docs/find
 Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
 Content-Type: "application/json"
-data:
+Request-Body:
     {
         "collection": "works",
         "filter": {
@@ -525,10 +438,11 @@ data:
             "batch_size": 0
         }
     }
-return:
-    Success:
+Response:
+    - HTTP/1.1 200
+
         {
-          "_status": "OK",
+          
           "items": [
             {
               "author": "john doe1_1",
@@ -552,15 +466,8 @@ return:
             }
           ]
         }
-    Failure:
-        {
-          "_status": "ERR",
-          "_error": {
-            "code": 401,
-            "message": "Error message"
-          }
-        }
-error code:
+
+Error-Code:
     (UNAUTHORIZED, "auth failed")
     (BAD_REQUEST, "vault does not exist.") 
     (BAD_REQUEST, "parameter is not application/json") 

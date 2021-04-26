@@ -10,3 +10,22 @@
 - [Vault Scripting](./hive-node-scripting.md)
 - [Vault backup](hive-node-backup.md)
 
+## Response uniform format
+- Success:
+    - HTTP/1.1 statue_code: 2xx, 3xx
+    - Json body
+        {
+          "data": "json code",
+        }
+    - stream data
+- Failure:
+    HTTP/1.1 status_code: 4xx, 5xx
+    - Json body
+        {
+            "error": {
+                "code": 401,//internal error code
+                "message": "error message",
+            }
+        }
+    - text body
+        exception which can not catch

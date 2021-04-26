@@ -71,14 +71,13 @@ def test_auth_common(self, user_did, app_did):
     logging.getLogger("test_auth_common").debug(f"\ndoc_str: {doc_str}")
     doc = json.loads(doc_str)
     rt, s = self.parse_response(
-        self.test_client.post('/api/v1/did/sign_in',
+        self.test_client.post('/api/v2/did/sign_in',
                               data=json.dumps({
                                   "document": doc,
                               }),
                               headers=self.json_header)
     )
     self.assert200(s)
-    self.assertEqual(rt["_status"], "OK")
     jwt = rt["challenge"]
     # print(jwt)
     jws = lib.DefaultJWSParser_Parse(jwt.encode())
@@ -98,14 +97,13 @@ def test_auth_common(self, user_did, app_did):
     logging.getLogger("test_auth_common").debug(f"\nauth_token: {auth_token}")
 
     rt, s = self.parse_response(
-        self.test_client.post('/api/v1/did/auth',
+        self.test_client.post('/api/v2/did/auth',
                               data=json.dumps({
                                   "jwt": auth_token,
                               }),
                               headers=self.json_header)
     )
     self.assert200(s)
-    self.assertEqual(rt["_status"], "OK")
 
     token = rt["access_token"]
     jws = lib.DefaultJWSParser_Parse(token.encode())
@@ -124,11 +122,10 @@ def test_auth_common(self, user_did, app_did):
         self.content_type,
     ]
     rt, s = self.parse_response(
-        self.test_client.post('/api/v1/did/check_token',
+        self.test_client.post('/api/v2/did/check_token',
                               headers=self.json_header)
     )
     self.assert200(s)
-    self.assertEqual(rt["_status"], "OK")
     return token, hive_did
 
 
@@ -138,28 +135,26 @@ def create_upload_file(self, file_name, data):
     temp.seek(0)
     temp.name = 'temp.txt'
 
-    upload_file_url = "/api/v1/files/upload/" + file_name
+    upload_file_url = "/api/v2/vault/files/" + file_name
     r2, s = self.parse_response(
-        self.test_client.post(upload_file_url,
-                              data=temp,
-                              headers=self.upload_auth)
+        self.test_client.put(upload_file_url,
+                             data=temp,
+                             headers=self.upload_auth)
     )
-    self.assert200(s)
-    self.assertEqual(r2["_status"], "OK")
+    self.assert201(s)
 
     r3, s = self.parse_response(
-        self.test_client.get('/api/v1/files/properties?path=' + file_name, headers=self.auth)
+        self.test_client.get(f'/api/v2/vault/files/{file_name}?comp=metadata', headers=self.auth)
     )
 
     self.assert200(s)
-    self.assertEqual(r3["_status"], "OK")
     logging.getLogger("HiveFileTestCase").debug(json.dumps(r3))
 
 
 def upsert_collection(self, col_name, doc):
     logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_create_collection")
     r, s = self.parse_response(
-        self.test_client.post('/api/v1/db/create_collection',
+        self.test_client.post('/api/v2/db/create_collection',
                               data=json.dumps(
                                   {
                                       "collection": col_name
@@ -170,7 +165,7 @@ def upsert_collection(self, col_name, doc):
     self.assert200(s)
 
     r, s = self.parse_response(
-        self.test_client.post('/api/v1/db/insert_one',
+        self.test_client.post('/api/v2/db/insert_one',
                               data=json.dumps(
                                   {
                                       "collection": col_name,
@@ -180,7 +175,6 @@ def upsert_collection(self, col_name, doc):
                               headers=self.auth)
     )
     self.assert200(s)
-    self.assertEqual(r["_status"], "OK")
 
 
 def prepare_vault_data(self):

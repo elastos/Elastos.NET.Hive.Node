@@ -33,6 +33,9 @@ class HiveInternalTest(LiveServerTestCase):
     def assert200(self, status):
         self.assertEqual(status, 200)
 
+    def assert201(self, status):
+        self.assertEqual(status, 201)
+
     def parse_response(self, r):
         try:
             v = json.loads(r.get_data())
@@ -80,14 +83,14 @@ class HiveInternalTest(LiveServerTestCase):
         param = {}
         token = test_common.get_auth_token()
 
-        r = requests.post(host + '/api/v1/service/vault_backup/create',
+        r = requests.post(host + '/api/v2/service/vault_backup/create',
                           json=param,
                           headers={"Content-Type": "application/json", "Authorization": "token " + token})
         self.assert200(r.status_code)
 
     def save_to_hive_node(self, vc_json, did):
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/backup/save_to_node',
+            self.test_client.post('/api/v2/backup/save_to_node',
                                   data=json.dumps({
                                       "backup_credential": vc_json,
                                   }),
@@ -99,7 +102,7 @@ class HiveInternalTest(LiveServerTestCase):
 
     def restore_from_hive_node(self, vc_json, did):
         rt, s = self.parse_response(
-            self.test_client.post('/api/v1/backup/restore_from_node',
+            self.test_client.post('/api/v2/backup/restore_from_node',
                                   data=json.dumps({
                                       "backup_credential": vc_json,
                                   }),

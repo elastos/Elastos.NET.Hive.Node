@@ -79,7 +79,7 @@ Coming soon
 After you deployed the Hive node in either way above, you can use curl to check whether it works or not with the following scheme command:
 
 ```shell
-$ curl -XPOST  -H "Content-Type: application/json" -d '{"key":"value"}' http://your-hive-node-ipaddress:5000/api/v1/echo
+$ curl -XPOST  -H "Content-Type: application/json" -d '{"key":"value"}' http://your-hive-node-ipaddress:5000/api/v2/echo
 ```
 which would return something below in case that it's been running.
 ```json
@@ -87,7 +87,7 @@ which would return something below in case that it's been running.
 ```
 You also can open the Browser to input the following URL to see the version of Hive node:
 ```http
-http://your-hive-node-ip-address:5000/api/v1/hive/version
+http://your-hive-node-ip-address:5000/api/v2/hive/version
 ```
 
 

@@ -32,7 +32,7 @@ from hive.util.payment.vault_service_manage import get_vault_service, get_vault_
 from hive.util.pyrsync import rsyncdelta, gene_blockchecksums, patchstream
 from hive.util.vault_backup_info import *
 from hive.util.rclone_tool import RcloneTool
-from hive.util.server_response import ServerResponse
+from hive.util.server_response import ServerResponseV2
 from hive.main.interceptor import post_json_param_pre_proc, did_post_json_param_pre_proc
 from hive.settings import hive_setting
 
@@ -42,7 +42,7 @@ class HiveBackup:
 
     def __init__(self):
         self.app = None
-        self.response = ServerResponse("HiveBackup")
+        self.response = ServerResponseV2("HiveBackup")
         self.backup_ftp = None
 
     def init_app(self, app, mode):

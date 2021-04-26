@@ -3,6 +3,7 @@ from flask import Blueprint, request
 from hive.main.hive_file import HiveFile
 from hive.main.interceptor import get_pre_proc, pre_proc
 from hive.util.constants import VAULT_ACCESS_WR, VAULT_ACCESS_R, VAULT_ACCESS_DEL
+from hive.util.error_code import NOT_ACCEPTABLE, FORBIDDEN
 
 h_file = HiveFile()
 
@@ -33,9 +34,8 @@ def get_file(file_name):
     if op is None:
         if file_name:
             return h_file.download_file(did, app_id, file_name)
-        # else:
-        # todo
-        # return h_file.response.response_err()
+        else:
+            return h_file.response.response_err(FORBIDDEN, "Can not download directory")
     elif op == "metadata":
         return h_file.get_property(did, app_id, file_name)
     elif op == "children":

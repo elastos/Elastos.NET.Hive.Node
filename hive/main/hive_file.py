@@ -96,9 +96,11 @@ class HiveFile:
 
         data, status_code = query_download(did, app_id, file_name)
         if status_code != SUCCESS:
-            resp.status_code = status_code
+            if status_code == NOT_FOUND:
+                self.response.response_err(status_code, "Not found file")
+            elif status_code == FORBIDDEN:
+                self.response.response_err(status_code, "Can not download directory")
             return resp
-
         return data
 
     def get_property(self, did, app_id, name):

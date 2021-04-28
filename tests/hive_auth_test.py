@@ -137,9 +137,9 @@ class HiveAuthTestCase(unittest.TestCase):
         logging.getLogger("HiveAuthTestCase").debug(f"\ndoc_str: {doc_str}")
         doc = json.loads(doc_str)
         rt, s = self.parse_response(
-            self.test_client.post('/api/v2/did/sign_in',
+            self.test_client.post('/api/v2/did/signin',
                                   data=json.dumps({
-                                      "document": doc,
+                                      "id": doc,
                                   }),
                                   headers=self.json_header)
         )
@@ -165,13 +165,13 @@ class HiveAuthTestCase(unittest.TestCase):
         rt, s = self.parse_response(
             self.test_client.post('/api/v2/did/auth',
                                   data=json.dumps({
-                                      "jwt": auth_token,
+                                      "challenge_response": auth_token,
                                   }),
                                   headers=self.json_header)
         )
         self.assert200(s)
 
-        token = rt["access_token"]
+        token = rt["token"]
         jws = lib.DefaultJWSParser_Parse(token.encode())
         aud = ffi.string(lib.JWT_GetAudience(jws)).decode()
         self.assertEqual(aud, testapp.get_did_string())

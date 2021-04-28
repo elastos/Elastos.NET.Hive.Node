@@ -9,19 +9,16 @@ import requests
 
 from hive.util.did.eladid import ffi, lib
 
-from hive.main.interceptor import post_json_param_pre_proc
 from hive.util.did_info import add_did_nonce_to_db, create_nonce, get_did_info_by_nonce, \
     get_did_info_by_app_instance_did, update_did_info_by_app_instance_did, \
     update_token_of_did_info
 from hive.util.error_code import UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST
 from hive.util.server_response import ServerResponseV2
 from hive.settings import hive_setting
-from hive.util.constants import DID_INFO_DB_NAME, DID_INFO_REGISTER_COL, DID, APP_ID, DID_INFO_NONCE, DID_INFO_TOKEN, \
-    DID_INFO_NONCE_EXPIRED, DID_INFO_TOKEN_EXPIRED, APP_INSTANCE_DID
+from hive.util.constants import DID_INFO_NONCE_EXPIRED, APP_INSTANCE_DID
 
 
 from hive.util.did.entity import Entity
-from hive.util.auth import did_auth
 
 ACCESS_AUTH_COL = "did_auth"
 ACCESS_TOKEN = "access_token"
@@ -41,22 +38,15 @@ class HiveAuth(Entity):
         self.storepass = hive_setting.DID_STOREPASS
         Entity.__init__(self, "hive.auth")
 
-    def sign_in(self):
-        body = request.get_json(force=True, silent=True)
-        if body is None:
-            return self.response.response_err(UNAUTHORIZED, "parameter is not application/json")
-        document = body.get('document', None)
-        if document is None:
-            return self.response.response_err(BAD_REQUEST, "Thd did document is null")
-
-        doc_str = json.dumps(body.get('document', None))
+    def sign_in(self, document):
+        doc_str = json.dumps(document)
         doc = lib.DIDDocument_FromJson(doc_str.encode())
         if (not doc) or (not lib.DIDDocument_IsValid(doc)):
-            return self.response.response_err(BAD_REQUEST, "Thd did document is vaild")
+            return self.response.response_err(BAD_REQUEST, "The did document is invalid")
 
         did = lib.DIDDocument_GetSubject(doc)
         if not did:
-            return self.response.response_err(BAD_REQUEST, "Thd did document is vaild, can't get did.")
+            return self.response.response_err(BAD_REQUEST, "The did document is invalid, can't get did.")
 
         spec_did_str = ffi.string(lib.DID_GetMethodSpecificId(did)).decode()
         try:
@@ -104,20 +94,20 @@ class HiveAuth(Entity):
         # check auth token
         auth_info, err = self.__get_auth_token_info(["appDid"])
         if auth_info is None:
-            return self.response.response_err(UNAUTHORIZED, err)
+            return self.response.response_err(BAD_REQUEST, err)
 
         # create access token
         access_token, err = self.__create_token(auth_info, "AccessToken")
         if not err is None:
-            return self.response.response_err(UNAUTHORIZED, err)
+            return self.response.response_err(BAD_REQUEST, err)
 
         # save to db
         if not self.__save_auth_info_to_db(auth_info, access_token):
-            return self.response.response_err(UNAUTHORIZED, "save to db fail!")
+            return self.response.response_err(BAD_REQUEST, "save to db fail!")
 
         # response token
         data = {
-            "access_token": access_token,
+            "token": access_token,
         }
         return self.response.response_ok(data)
 
@@ -126,7 +116,7 @@ class HiveAuth(Entity):
         body = request.get_json(force=True, silent=True)
         if body is None:
             return None, "The parameter is not application/json"
-        jwt = body.get('jwt', None)
+        jwt = body.get('challenge_response', None)
 
         if jwt is None:
             return None, "The jwt is none."
@@ -426,6 +416,6 @@ class HiveAuth(Entity):
 
         # response token
         data = {
-            "backup_token": backup_token,
+            "token": backup_token,
         }
         return self.response.response_ok(data)

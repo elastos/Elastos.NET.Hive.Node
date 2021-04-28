@@ -11,7 +11,7 @@ import sys
 import requests
 from pathlib import Path
 
-from hive.main import view
+from hive.main import view_auth
 from hive.util.auth import did_auth
 from hive.util.common import did_tail_part, create_full_path_dir, get_host, deal_dir, get_file_md5_info, \
     get_file_checksum_list, gene_temp_file_name
@@ -228,7 +228,7 @@ class HiveBackup:
                                                          access_vault=VAULT_ACCESS_R)
         if err:
             return None, None, err
-        host, backup_token, err = view.h_auth.backup_auth_request(content)
+        host, backup_token, err = view_auth.h_auth.backup_auth_request(content)
         if err:
             return None, None, self.response.response_err(UNAUTHORIZED, err)
 

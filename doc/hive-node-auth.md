@@ -34,11 +34,11 @@
     ```YAML
     Request: 
         POST /api/v2/did/auth
-        {"challengeResponse": "auth_token"}
+        {"challenge_response": "auth_token"}
     Response:
         HTTP/1.1 202 Accepted
         {
-          "access_token": access_token,
+          "token": access_token,
         }
     ```
 

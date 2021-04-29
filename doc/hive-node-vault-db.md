@@ -46,44 +46,7 @@ Error-Code:
     (INTERNAL_SERVER_ERROR, Exception message)
 ```
 
-## Insert a new document in a given collection
-    * collection: collection name.
-    * document: The document to insert. Must be a mutable mapping type. If the document does not have an _id field one will be added automatically.
-    * options:
-        bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
-```YAML
-Method: PUT
-Endpoint: /api/v2/vault/db/doc
-Authorization: "token 38b8c2c1093dd0fec383a9d9ac940515"
-Content-Type: "application/json"
-Request-Body:
-    {
-      "collection": "works",
-      "document": {
-        "author": "john doe1",
-        "title": "Eve for Dummies2"
-      },
-      "options": {"bypass_document_validation":false}
-    }
-Response:
-    - HTTP/1.1 201
-    {
-      "acknowledged": true,
-      "inserted_id": "5edddab688db87875fddc3a5"
-    }
-
-Error-Code:
-    (UNAUTHORIZED, "auth failed")
-    (BAD_REQUEST, "vault does not exist.")
-    (BAD_REQUEST, "vault have been freeze, can not write")
-    (BAD_REQUEST, "not enough storage space")
-    (BAD_REQUEST, "parameter is not application/json")
-    (BAD_REQUEST, "parameter is null")
-    (NOT_FOUND, "collection not exist")
-    (INTERNAL_SERVER_ERROR, Exception message)
-```
-
-## Insert many new documents in a given collection
+## Insert new documents in a given collection
     * collection: collection name.
     * document: The document to insert. Must be a mutable mapping type. If the document does not have an _id field one will be added automatically.
     * options:

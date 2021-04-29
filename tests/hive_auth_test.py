@@ -5,6 +5,7 @@ import logging
 from flask import appcontext_pushed, g
 from contextlib import contextmanager
 from datetime import datetime
+from urllib.parse import urlencode, unquote, quote
 
 # import os
 # import sys
@@ -57,6 +58,7 @@ class DIDApp(Entity):
         did = lib.DID_FromString(hive1_did.encode())
         return self.issue_auth_vc("BackupCredential", props, did)
 
+
 # ---------------
 class DApp(Entity):
     access_token = "123"
@@ -72,6 +74,7 @@ class DApp(Entity):
 
     def set_access_token(self, token):
         self.access_token = token
+
 
 # ------------------
 class HiveAuthTestCase(unittest.TestCase):
@@ -194,7 +197,16 @@ class HiveAuthTestCase(unittest.TestCase):
         self.assert200(s)
         return token, hive_did
 
-    #test sign in auth
+    def test_int_a(self):
+        d = {"author": "john doe1_1", "author1": "john doe1_2"}
+        js = json.dumps(d)
+        print("in:" + js)
+        encode = quote(js)
+        print("encode:" + encode)
+        dejs = unquote(encode)
+        print("decode:" + dejs)
+
+    # test sign in auth
     def test_b_auth(self):
         logging.getLogger("HiveAuthTestCase").debug("\nRunning test_b_auth")
 
@@ -206,8 +218,10 @@ class HiveAuthTestCase(unittest.TestCase):
     def test_c_auth(self):
         logging.getLogger("HiveAuthTestCase").debug("\nRunning test_c_auth")
         didapp = DIDApp("didapp", "clever bless future fuel obvious black subject cake art pyramid member clump")
-        testapp1 = DApp("testapp1", test_common.app_id, "amount material swim purse swallow gate pride series cannon patient dentist person")
-        testapp2 = DApp("testapp2", test_common.app_id2, "chimney limit involve fine absent topic catch chalk goat era suit leisure", "")
+        testapp1 = DApp("testapp1", test_common.app_id,
+                        "amount material swim purse swallow gate pride series cannon patient dentist person")
+        testapp2 = DApp("testapp2", test_common.app_id2,
+                        "chimney limit involve fine absent topic catch chalk goat era suit leisure", "")
         # testapp3 = DApp("testapp3", "appid3", "license mango cluster candy payment prefer video rice desert pact february rabbit")
         token = self.__test_auth_common(didapp, testapp1)
         token2 = self.__test_auth_common(didapp, testapp2)

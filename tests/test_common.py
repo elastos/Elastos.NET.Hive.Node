@@ -154,34 +154,30 @@ def create_upload_file(self, file_name, data):
 def upsert_collection(self, col_name, doc):
     logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_create_collection")
     r, s = self.parse_response(
-        self.test_client.post('/api/v2/db/create_collection',
-                              data=json.dumps(
-                                  {
-                                      "collection": col_name
-                                  }
-                              ),
+        self.test_client.put(f'/api/v2/vault/db/{col_name}',
                               headers=self.auth)
     )
-    self.assert200(s)
 
     r, s = self.parse_response(
-        self.test_client.post('/api/v2/db/insert_one',
+        self.test_client.post(f'/api/v2/vault/db/collection/{col_name}',
                               data=json.dumps(
                                   {
-                                      "collection": col_name,
                                       "document": doc,
                                   }
                               ),
                               headers=self.auth)
     )
-    self.assert200(s)
+    if s == 200 or s == 201:
+        return
+    else:
+        self.assertTrue(False)
 
 
 def prepare_vault_data(self):
     doc = dict()
     for i in range(1, 10):
         doc["work" + str(i)] = "work_content" + str(i)
-        upsert_collection(self, "works", doc)
+        upsert_collection(self, "works", [doc])
     create_upload_file(self, "test0.txt", "this is a test 0 file")
     create_upload_file(self, "f1/test1.txt", "this is a test 1 file")
     create_upload_file(self, "f1/test1_2.txt", "this is a test 1_2 file")

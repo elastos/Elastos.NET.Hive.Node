@@ -82,32 +82,32 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
     def assert201(self, status):
         self.assertEqual(status, 201)
 
+    def assert2xx(self, status):
+        if status == 200 or status == 201:
+            return
+        else:
+            self.assertTrue(False)
+
     def init_collection_for_test(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning init_collection_for_test")
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/create_collection',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "groups"
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.put('/api/v2/vault/db/groups',
+                                 headers=self.auth)
         )
-        self.assert200(s)
+        self.assert2xx(s)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/insert_one',
+            self.test_client.post('/api/v2/vault/db/collection/groups',
                                   data=json.dumps(
                                       {
-                                          "collection": "groups",
-                                          "document": {
+                                          "document": [{
                                               "friends": "did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM",
-                                          }
+                                          }]
                                       }
                                   ),
                                   headers=self.auth)
         )
-        self.assert200(s)
+        self.assert201(s)
 
     def test_1_set_script_without_condition(self):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_1_set_script_without_condition")
@@ -281,18 +281,15 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
         logging.getLogger("HiveMongoScriptingTestCase").debug("\nRunning test_5_run_script_with_condition")
 
         # Set up the pre-requisites to run this test
-        self.test_client.post('/api/v2/db/create_collection',
-                              data=json.dumps({"collection": "test_group"}),
-                              headers=self.auth)
-        r, s = self.parse_response(self.test_client.post('/api/v2/db/insert_one',
-                                                         data=json.dumps({"collection": "test_group",
-                                                                          "document": {"name": "Trinity",
-                                                                                       "friends": [did]}}),
+        self.test_client.put('/api/v2/vault/db/test_group',
+                             headers=self.auth)
+        r, s = self.parse_response(self.test_client.post('/api/v2/vault/db/collection/test_group',
+                                                         data=json.dumps({"document": [{"name": "Trinity",
+                                                                                       "friends": [did]}]}),
                                                          headers=self.auth))
-        self.assert200(s)
-
+        self.assert2xx(s)
         # Run the actual test
-        group_id = r["inserted_id"]
+        group_id = r["inserted_ids"][0]
         r, s = self.parse_response(
             self.test_client.post('/api/v2/scripting/run_script',
                                   data=json.dumps(
@@ -308,8 +305,7 @@ class HiveMongoScriptingTestCase(unittest.TestCase):
         self.assert200(s)
 
         # Tear down
-        self.test_client.post('/api/v2/db/delete_collection',
-                              data=json.dumps({"collection": "test_group"}),
+        self.test_client.delete('/api/v2/vault/db/test_group',
                               headers=self.auth)
 
     def test_7_run_script_with_anonymous_access(self):

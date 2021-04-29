@@ -3,6 +3,8 @@ import sys
 import time
 import unittest
 import logging
+from urllib.parse import quote
+
 from flask import appcontext_pushed, g
 from contextlib import contextmanager
 from hive import create_app, HIVE_MODE_TEST
@@ -48,10 +50,12 @@ class HiveMongoDbTestCase(unittest.TestCase):
         ]
         test_common.setup_test_auth_token()
         self.init_auth()
+        self.clear_db()
         self.did = test_common.get_auth_did()
         self.app_id = test_common.get_auth_app_did()
         test_common.setup_test_vault(self.did)
-        self.create_collection()
+        self.init_collection()
+        self.init_col_item()
 
     def init_auth(self):
         token = test_common.get_auth_token()
@@ -64,8 +68,13 @@ class HiveMongoDbTestCase(unittest.TestCase):
         test_common.delete_test_auth_token()
         logging.getLogger("HiveMongoDbTestCase").info("\n")
 
-    def init_db(self):
-        pass
+    def clear_db(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_create_collection")
+        r, s = self.parse_response(
+            self.test_client.delete('/api/v2/vault/db/works',
+                                    headers=self.auth)
+        )
+        self.assertEquals(s, 204)
 
     def parse_response(self, r):
         try:
@@ -81,309 +90,156 @@ class HiveMongoDbTestCase(unittest.TestCase):
     def assert201(self, status):
         self.assertEqual(status, 201)
 
-    def create_collection(self):
+    def init_collection(self):
         logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_create_collection")
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/create_collection',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works"
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.put('/api/v2/vault/db/works',
+                                 headers=self.auth)
+        )
+        self.assert201(s)
+
+        r, s = self.parse_response(
+            self.test_client.put('/api/v2/vault/db/works',
+                                 headers=self.auth)
         )
         self.assert200(s)
 
+    def init_col_item(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_insert")
+        dic = {
+            "document": [
+                {
+                    "author": "john doe1",
+                    "title": "Eve for Dummies1_1"
+                },
+                {
+                    "author": "john doe1",
+                    "title": "Eve for Dummies1_2"
+                },
+                {
+                    "author": "john doe1",
+                    "title": "Eve for Dummies1_3"
+                },
+                {
+                    "author": "john doe2",
+                    "title": "Eve for Dummies2"
+                },
+                {
+                    "author": "john doe3",
+                    "title": "Eve for Dummies3"
+                }
+            ],
+            "options": {"bypass_document_validation": False, "ordered": True}
+        }
+        self.insert_item("works", dic)
+
+    def insert_item(self, col, doc):
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/create_collection',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works"
-                                      }
-                                  ),
+            self.test_client.post(f'/api/v2/vault/db/collection/{col}',
+                                  data=json.dumps(doc),
                                   headers=self.auth)
+        )
+        self.assert201(s)
+
+    def count_item(self, col, filter_dict, skip, limit):
+        fi = quote(json.dumps(filter_dict))
+        r, s = self.parse_response(
+            self.test_client.get(f'/api/v2/vault/db/collection/{col}?count=true&filter={fi}&skip={skip}&limit={limit}',
+                                 headers=self.auth)
         )
         self.assert200(s)
-        self.assertTrue(r["existing"])
+        return r['count']
 
-
-    def test_2_insert_one(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_2_insert_one")
+    def get_item(self, col, filter_dict, skip, limit):
+        fi = quote(json.dumps(filter_dict))
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/insert_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "document": {
-                                              "author": "john doe1",
-                                              "title": "Eve for Dummies2"
-                                          },
-                                          "options": {"bypass_document_validation": False}
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.get(f'/api/v2/vault/db/collection/{col}?filter={fi}&skip={skip}&limit={limit}',
+                                 headers=self.auth)
         )
         self.assert200(s)
+        return r
 
-    def test_3_insert_many(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_3_insert_many")
+    def test_count_documents(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_count_documents")
+        fi_dict = {"author": "john doe1"}
+        count = self.count_item("works", fi_dict, 0, 10)
+        self.assertEqual(3, count)
+
+    def test_find(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_find")
+        fi_dict = {"author": "john doe1"}
+        doc = self.get_item("works", fi_dict, 0, 2)
+        items = doc["items"]
+        for it in items:
+            self.assertEqual(it["author"], "john doe1")
+
+    def test_find_none_filter(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_find_none_filter")
+        fi_dict = {"author": "john doe1"}
+        doc = self.get_item("works", fi_dict, 1, 2)
+        items = doc["items"]
+        self.assertEqual(2, len(items))
+
+    def test_update_item(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_update_item")
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/insert_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "document": [
-                                              {
-                                                  "author": "john doe1",
-                                                  "title": "Eve for Dummies1_2"
-                                              },
-                                              {
-                                                  "author": "john doe2",
-                                                  "title": "Eve for Dummies2"
-                                              },
-                                              {
-                                                  "author": "john doe3",
-                                                  "title": "Eve for Dummies3"
-                                              }
-                                          ],
-                                          "options": {"bypass_document_validation": False, "ordered": True}
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.patch('/api/v2/vault/db/collection/works',
+                                   data=json.dumps(
+                                       {
+                                           "filter": {
+                                               "author": "john doe2",
+                                           },
+                                           "update": {"$set": {
+                                               "author": "john doe2_2",
+                                               "title": "Eve for Dummies2_2_1"
+                                           }},
+                                           "options": {
+                                               "upsert": True,
+                                               "bypass_document_validation": False
+                                           }
+                                       }
+                                   ),
+                                   headers=self.auth)
         )
         self.assert200(s)
+        fi_dict = {"author": "john doe2"}
+        count = self.count_item("works", fi_dict, 0, 10)
+        self.assertEqual(0, count)
 
-    def test_4_count_documents(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_8_count_documents")
+        fi_dict = {"author": "john doe2_2"}
+        count = self.count_item("works", fi_dict, 0, 10)
+        self.assertEqual(1, count)
+
+    def test_delete_item(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_delete_item")
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/count_documents',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe1_1",
-                                          },
-                                          "options": {
-                                              "skip": 0,
-                                              "limit": 10,
-                                              "maxTimeMS": 1000000000
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.delete('/api/v2/vault/db/collection/works',
+                                    data=json.dumps(
+                                        {
+                                            "filter": {
+                                                "author": "john doe3",
+                                            }
+                                        }
+                                    ),
+                                    headers=self.auth)
         )
-        self.assert200(s)
+        self.assertEqual(s, 204)
+        fi_dict = {"author": "john doe3"}
+        count = self.count_item("works", fi_dict, 0, 10)
+        self.assertEqual(0, count)
 
-    def test_5_find_one(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_9_find_one")
+    def test_delete_collection(self):
+        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_delete_collection")
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/find_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe2",
-                                          },
-                                          "options": {
-                                              "skip": 0,
-                                              "projection": {"_id": False},
-                                              "sort": {'_id': -1},
-                                              "allow_partial_results": False,
-                                              "return_key": False,
-                                              "show_record_id": False,
-                                              "batch_size": 0
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.delete('/api/v2/vault/db/works',
+                                    headers=self.auth)
         )
-        self.assert200(s)
-
-    def test_6_1_find_one_null_filter(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_9_1_find_one_null_filter")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/find_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "options": {
-                                              "skip": 0,
-                                              "projection": {"_id": False},
-                                              "sort": {'_id': -1},
-                                              "allow_partial_results": False,
-                                              "return_key": False,
-                                              "show_record_id": False,
-                                              "batch_size": 0
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_7_find_many(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_10_find_many")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/find_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe1"
-                                          },
-                                          "options": {
-                                              "skip": 0,
-                                              "limit": 3,
-                                              "projection": {"_id": False},
-                                              "sort": {"_id": -1},
-                                              "allow_partial_results": False,
-                                              "return_key": False,
-                                              "show_record_id": False,
-                                              "batch_size": 0
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_8_find_many_none_filter(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_10_find_many_none_filter")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/find_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "options": {
-                                              "skip": 0,
-                                              "limit": 3,
-                                              "projection": {"_id": False},
-                                              "sort": {"_id": -1},
-                                              "allow_partial_results": False,
-                                              "return_key": False,
-                                              "show_record_id": False,
-                                              "batch_size": 0
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_9_update_one(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_4_update_one")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/update_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe3_1"
-                                          },
-                                          "update": {"$set": {
-                                              "author": "john doe3_1",
-                                              "title": "Eve for Dummies3_1"
-                                          }},
-                                          "options": {
-                                              "upsert": True,
-                                              "bypass_document_validation": False
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_10_update_many(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_5_update_many")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/update_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe2",
-                                          },
-                                          "update": {"$set": {
-                                              "author": "john doe1_1",
-                                              "title": "Eve for Dummies1_1"
-                                          }},
-                                          "options": {
-                                              "upsert": True,
-                                              "bypass_document_validation": False
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_11_delete_one(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_6_delete_one")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/delete_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe3_1",
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_12_delete_many(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_7_delete_many")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/delete_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe3_1",
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
-
-    def test_13_delete_collection(self):
-        logging.getLogger("HiveMongoDbTestCase").debug("\nRunning test_1_2_delete_collection")
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/delete_collection',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works"
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assert200(s)
+        self.assertEqual(s, 204)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/insert_one',
+            self.test_client.post('/api/v2/vault/db/collection/works',
                                   data=json.dumps(
                                       {
-                                          "collection": "works",
-                                          "document": {
-                                              "author": "john doe1",
-                                              "title": "Eve for Dummies2"
-                                          },
-                                          "options": {"bypass_document_validation": False}
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assertEqual(s, 404)
-
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/insert_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
                                           "document": [
                                               {
                                                   "author": "john doe1",
@@ -406,74 +262,36 @@ class HiveMongoDbTestCase(unittest.TestCase):
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/update_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe3_1"
-                                          },
-                                          "update": {"$set": {
-                                              "author": "john doe3_1",
-                                              "title": "Eve for Dummies3_1"
-                                          }},
-                                          "options": {
-                                              "upsert": True,
-                                              "bypass_document_validation": False
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.patch('/api/v2/vault/db/collection/works',
+                                   data=json.dumps(
+                                       {
+                                           "filter": {
+                                               "author": "john doe3_1"
+                                           },
+                                           "update": {"$set": {
+                                               "author": "john doe3_1",
+                                               "title": "Eve for Dummies3_1"
+                                           }},
+                                           "options": {
+                                               "upsert": True,
+                                               "bypass_document_validation": False
+                                           }
+                                       }
+                                   ),
+                                   headers=self.auth)
         )
         self.assertEqual(s, 404)
 
         r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/update_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe1",
-                                          },
-                                          "update": {"$set": {
-                                              "author": "john doe1_1",
-                                              "title": "Eve for Dummies1_1"
-                                          }},
-                                          "options": {
-                                              "upsert": True,
-                                              "bypass_document_validation": False
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assertEqual(s, 404)
-
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/delete_one',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe3_1",
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
-        )
-        self.assertEqual(s, 404)
-
-        r, s = self.parse_response(
-            self.test_client.post('/api/v2/db/delete_many',
-                                  data=json.dumps(
-                                      {
-                                          "collection": "works",
-                                          "filter": {
-                                              "author": "john doe3_1",
-                                          }
-                                      }
-                                  ),
-                                  headers=self.auth)
+            self.test_client.delete('/api/v2/vault/db/collection/works',
+                                    data=json.dumps(
+                                        {
+                                            "filter": {
+                                                "author": "john doe3_1",
+                                            }
+                                        }
+                                    ),
+                                    headers=self.auth)
         )
         self.assertEqual(s, 404)
 

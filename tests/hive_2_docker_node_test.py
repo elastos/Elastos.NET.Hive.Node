@@ -181,14 +181,14 @@ class Hive2NodeTest(unittest.TestCase):
         rt = r.json()
 
     def upsert_collection(self, host, token, col_name, doc):
-        r = requests.post(host + '/api/v2/db/create_collection',
+        r = requests.post(host + '/api/v2/vault/db/create_collection',
                           json={
                               "collection": col_name
                           },
                           headers=self.auth_header(token))
         self.assert200(r.status_code)
 
-        r = requests.post(host + '/api/v2/db/insert_one',
+        r = requests.post(host + '/api/v2/vault/db/insert_one',
                           json={
                               "collection": col_name,
                               "document": doc,
@@ -208,7 +208,7 @@ class Hive2NodeTest(unittest.TestCase):
         self.create_upload_file(host, token, "f2/f1/test2_2.txt", "this is a test 2_2 file")
 
     def check_vault_data(self, host, token):
-        r = requests.post(host + '/api/v2/db/find_many',
+        r = requests.post(host + '/api/v2/vault/db/find_many',
                           json={
                               "collection": "works"
                           },
@@ -222,7 +222,7 @@ class Hive2NodeTest(unittest.TestCase):
         # print(r1.json())
 
     def clean_vault_data(self, host, token):
-        r = requests.post(host + '/api/v2/db/delete_collection',
+        r = requests.post(host + '/api/v2/vault/db/delete_collection',
                           json={
                               "collection": "works"
                           },
@@ -231,7 +231,7 @@ class Hive2NodeTest(unittest.TestCase):
 
         time.sleep(2)
 
-        r = requests.post(host + '/api/v2/db/find_many',
+        r = requests.post(host + '/api/v2/vault/db/find_many',
                           json={
                               "collection": "works"
                           },

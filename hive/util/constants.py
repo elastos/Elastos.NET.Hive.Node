@@ -128,17 +128,29 @@ HIVE_MODE_DEV = "dev"
 HIVE_MODE_PROD = "prod"
 HIVE_MODE_TEST = "test"
 
-INTER_BACKUP_SERVICE_URL = '/api/v2/inter/backup/service'
-INTER_BACKUP_SAVE_FINISH_URL = '/api/v2/inter/backup/save_finish'
-INTER_BACKUP_RESTORE_FINISH_URL = '/api/v2/inter/backup/restore_finish'
+INTER_BACKUP_SERVICE_URL_V2 = '/api/v2/inter/backup/service'
+INTER_BACKUP_SAVE_FINISH_URL_V2 = '/api/v2/inter/backup/save_finish'
+INTER_BACKUP_RESTORE_FINISH_URL_V2 = '/api/v2/inter/backup/restore_finish'
 
-INTER_BACKUP_FILE_LIST_URL = '/api/v2/inter/backup/file_list'
-INTER_BACKUP_FILE_URL = '/api/v2/inter/backup/file'
-INTER_BACKUP_MOVE_FILE_URL = '/api/v2/inter/backup/move'
-INTER_BACKUP_COPY_FILE_URL = '/api/v2/inter/backup/copy'
-INTER_BACKUP_PATCH_HASH_URL = '/api/v2/inter/backup/patch/hash'
-INTER_BACKUP_PATCH_DELTA_URL = '/api/v2/inter/backup/patch/delta'
-INTER_BACKUP_GENE_DELTA_URL = '/api/v2/inter/backup/gene/delta'
+INTER_BACKUP_FILE_LIST_URL_V2 = '/api/v2/inter/backup/file_list'
+INTER_BACKUP_FILE_URL_V2 = '/api/v2/inter/backup/file'
+INTER_BACKUP_MOVE_FILE_URL_V2 = '/api/v2/inter/backup/move'
+INTER_BACKUP_COPY_FILE_URL_V2 = '/api/v2/inter/backup/copy'
+INTER_BACKUP_PATCH_HASH_URL_V2 = '/api/v2/inter/backup/patch/hash'
+INTER_BACKUP_PATCH_DELTA_URL_V2 = '/api/v2/inter/backup/patch/delta'
+INTER_BACKUP_GENE_DELTA_URL_V2 = '/api/v2/inter/backup/gene/delta'
+
+INTER_BACKUP_SERVICE_URL_V1 = '/api/v1/inter/backup/service'
+INTER_BACKUP_SAVE_FINISH_URL_V1 = '/api/v1/inter/backup/save_finish'
+INTER_BACKUP_RESTORE_FINISH_URL_V1 = '/api/v1/inter/backup/restore_finish'
+
+INTER_BACKUP_FILE_LIST_URL_V1 = '/api/v1/inter/backup/file_list'
+INTER_BACKUP_FILE_URL_V1 = '/api/v1/inter/backup/file'
+INTER_BACKUP_MOVE_FILE_URL_V1 = '/api/v1/inter/backup/move'
+INTER_BACKUP_COPY_FILE_URL_V1 = '/api/v1/inter/backup/copy'
+INTER_BACKUP_PATCH_HASH_URL_V1 = '/api/v1/inter/backup/patch/hash'
+INTER_BACKUP_PATCH_DELTA_URL_V1 = '/api/v1/inter/backup/patch/delta'
+INTER_BACKUP_GENE_DELTA_URL_V1 = '/api/v1/inter/backup/gene/delta'
 
 
 CHUNK_SIZE = 4096

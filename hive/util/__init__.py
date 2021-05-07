@@ -1,2 +1,2 @@
-__all__ = ['auth', 'constants', 'did_info', 'server_response']
+__all__ = ['constants', 'did_info', 'server_response_v2', 'server_response']
 

@@ -70,6 +70,31 @@ function start_direct () {
     LD_LIBRARY_PATH="$PWD/hive/util/did/" python manage.py runserver
 }
 
+function run_test_v1 () {
+    # Run tests
+    pytest --disable-pytest-warnings -xs tests/v1/hive_auth_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_mongo_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_file_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_scripting_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_payment_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_backup_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_internal_test.py
+    pytest --disable-pytest-warnings -xs tests/v1/hive_pubsub_test.py
+}
+
+function run_test_v2 () {
+    # Run tests
+    pytest --disable-pytest-warnings -xs tests/v2/hive_auth_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_mongo_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_file_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_scripting_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_payment_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_backup_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_internal_test.py
+    pytest --disable-pytest-warnings -xs tests/v2/hive_pubsub_test.py
+}
+
+
 function test () {
     docker network create hive
 
@@ -79,14 +104,8 @@ function test () {
     setup_venv
 
     # Run tests
-    pytest --disable-pytest-warnings -xs tests/hive_auth_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_mongo_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_file_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_scripting_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_payment_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_backup_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_internal_test.py
-    pytest --disable-pytest-warnings -xs tests/hive_pubsub_test.py
+    run_test_v2
+    run_test_v1
 
     docker container stop hive-mongo && docker container rm -f hive-mongo
     docker container stop hive-test-mongo && docker container rm -f hive-test-mongo
